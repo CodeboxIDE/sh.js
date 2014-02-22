@@ -64,14 +64,14 @@ function cancel(a) {
     k.prototype = c.prototype;
     a.prototype = new k
 };
-function c(a, k, y) {
+function Terminal(a, k, y) {
     EventEmitter.call(this);
 
     var f;
     "object" === typeof a && (f = a, a = f.cols, k = f.rows, y = f.handler);
     this._options = f || {};
-    this.cols = a || c.geometry[0];
-    this.rows = k || c.geometry[1];
+    this.cols = a || Terminal.geometry[0];
+    this.rows = k || Terminal.geometry[1];
     if (y) this.on("data", y);
     this.cursorState = this.y = this.x = this.ydisp = this.ybase = 0;
     this.convertEol = this.cursorHidden = !1;
@@ -128,10 +128,10 @@ var v = this,
     z = this.document,
     s = 1;
 
-inherits(c, EventEmitter);
-c.colors =
+inherits(Terminal, EventEmitter);
+Terminal.colors =
     "#000000 #c81908 #00c01d #c8c221 #0033c5 #c73ac5 #00c6c7 #c7c7c7 #686868 #8a8a8a #67f86e #fff970 #6678fc #ff7cfd #65fdff #ffffff".split(" ");
-c.colors = function () {
+Terminal.colors = function () {
     function a(a, c, f) {
         y.push("#" + k(a) + k(c) + k(f))
     }
@@ -140,42 +140,42 @@ c.colors = function () {
         a = a.toString(16);
         return 2 > a.length ? "0" + a : a
     }
-    var y = c.colors,
+    var y = Terminal.colors,
         f = [0, 95, 135, 175, 215, 255],
         v;
     for (v = 0; 216 > v; v++) a(f[v / 36 % 6 | 0], f[v / 6 % 6 | 0], f[v % 6]);
     for (v = 0; 24 > v; v++) f = 8 + 10 * v, a(f, f, f);
     return y
 }();
-c.defaultColors = {
+Terminal.defaultColors = {
     bg: "#000000",
     fg: "#f0f0f0"
 };
-c.colors[256] = c.defaultColors.bg;
-c.colors[257] = c.defaultColors.fg;
-c.termName = "xterm";
-c.geometry = [80, 24];
-c.visualBell = !1;
-c.popOnBell = !1;
-c.scrollback = 1E3;
-c.screenKeys = !1;
-c.programFeatures = !1;
-c.debug = !1;
-c.focus = null;
-c.prototype.focus = function () {
+Terminal.colors[256] = Terminal.defaultColors.bg;
+Terminal.colors[257] = Terminal.defaultColors.fg;
+Terminal.termName = "xterm";
+Terminal.geometry = [80, 24];
+Terminal.visualBell = !1;
+Terminal.popOnBell = !1;
+Terminal.scrollback = 1E3;
+Terminal.screenKeys = !1;
+Terminal.programFeatures = !1;
+Terminal.debug = !1;
+Terminal.focus = null;
+Terminal.prototype.focus = function () {
     this.selectionMode = !1;
     this.inputElement.focus();
-    c.focus !== this && (c.focus && (c.focus.cursorState = 0, c.focus.refresh(c.focus.y, c.focus.y), c.focus.sendFocus && c.focus.send("\u001b[O")), c.focus = this, this.sendFocus && this.send("\u001b[I"), this.showCursor())
+    Terminal.focus !== this && (Terminal.focus && (Terminal.focus.cursorState = 0, Terminal.focus.refresh(Terminal.focus.y, Terminal.focus.y), Terminal.focus.sendFocus && Terminal.focus.send("\u001b[O")), Terminal.focus = this, this.sendFocus && this.send("\u001b[I"), this.showCursor())
 };
-c.prototype.toggleVirtualCtrlKey = function () {
+Terminal.prototype.toggleVirtualCtrlKey = function () {
     this.virtualCtrlKey = !this.virtualCtrlKey;
     this.ctrlKeyElement.className = this.virtualCtrlKey ? "active" : ""
 };
-c.prototype.toggleVirtualAltKey = function () {
+Terminal.prototype.toggleVirtualAltKey = function () {
     this.virtualAltKey = !this.virtualAltKey;
     this.altKeyElement.className = this.virtualAltKey ? "active" : ""
 };
-c.prototype.applyVirtualKey = function (a) {
+Terminal.prototype.applyVirtualKey = function (a) {
     if (!this.virtualCtrlKey && !this.virtualAltKey) return a;
     var c = {
         altGraphKey: a.altGraphKey,
@@ -195,12 +195,12 @@ c.prototype.applyVirtualKey = function (a) {
             a.stopPropagation && a.stopPropagation()
         }
     };
-    this.virtualCtrlKey && (c.ctrlKey = !0, this.toggleVirtualCtrlKey());
-    this.virtualAltKey && (c.altKey = !0, this.toggleVirtualAltKey());
+    this.virtualCtrlKey && (Terminal.ctrlKey = !0, this.toggleVirtualCtrlKey());
+    this.virtualAltKey && (Terminal.altKey = !0, this.toggleVirtualAltKey());
     return c
 };
-c.prototype.bindKeys = function () {
-    if (!c.focus) {
+Terminal.prototype.bindKeys = function () {
+    if (!Terminal.focus) {
         var a = this;
         on(this.tabKeyElement, "touchend", function (c) {
             a.keyDown({
@@ -258,7 +258,7 @@ c.prototype.bindKeys = function () {
         })
     }
 };
-c.prototype.open =
+Terminal.prototype.open =
     function () {
         var a = this,
             E = 0,
@@ -329,11 +329,11 @@ c.prototype.open =
             }, 20)
         });
         this.bindMouse();
-        null == c.brokenBold && (c.brokenBold = A());
-        this.element.style.backgroundColor = c.defaultColors.bg;
-        this.element.style.color = c.defaultColors.fg
+        null == Terminal.brokenBold && (Terminal.brokenBold = A());
+        this.element.style.backgroundColor = Terminal.defaultColors.bg;
+        this.element.style.color = Terminal.defaultColors.fg
 };
-c.prototype.sizeToFit = function () {
+Terminal.prototype.sizeToFit = function () {
     var a = z.createElement("div");
     a.className = "terminal";
     a.style.width = "0";
@@ -355,7 +355,7 @@ c.prototype.sizeToFit = function () {
     a.parentNode.removeChild(a);
     this.resize(v, k)
 };
-c.prototype.bindMouse = function () {
+Terminal.prototype.bindMouse = function () {
     function a(a) {
         var c, k, p, y;
         switch (a.type) {
@@ -487,14 +487,14 @@ c.prototype.bindMouse = function () {
         if (!s.mouseEvents && !s.applicationKeypad) return "DOMMouseScroll" === a.type ? s.scrollDisp(0 > a.detail ? -5 : 5) : s.scrollDisp(0 < a.wheelDeltaY ? -5 : 5), cancel(a)
     })
 };
-c.prototype.destroy = function () {
+Terminal.prototype.destroy = function () {
     this.writable = this.readable = !1;
     this._events = {};
     this.handler = function () {};
     this.write = function () {}
 };
-c.prototype.refresh = function (a, k) {
-    var y, f, v, z, s, u, p, q, t, x, F, A, H, L = c.focus === this;
+Terminal.prototype.refresh = function (a, k) {
+    var y, f, v, z, s, u, p, q, t, x, F, A, H, L = Terminal.focus === this;
     k - a >= this.rows / 2 && (H = this.element.parentNode) && H.removeChild(this.element);
     p = this.cols;
     for (f = a; f <= k; f++) {
@@ -508,8 +508,8 @@ c.prototype.refresh = function (a, k) {
             q = z[v][0];
             u = z[v][1];
             v === y && (t = q, q = -1);
-            q !== x && (x !== this.defAttr && (s += "</span>"), q !== this.defAttr && (s += "<span ", -1 === q ? (s += 'class="terminal-cursor" ', L ? (F = t >> 9 & 511, x = t & 511) : (F = t & 511, x = t >> 9 & 511), A = t >> 18) : (F = q & 511, x = q >> 9 & 511, A = q >> 18), s += 'style="', !L && -1 === q && (s += "outline:1px solid " + c.colors[x] + ";"), A & 1 && (c.brokenBold || (s += "font-weight:bold;"), 8 > x && (x += 8)), A & 2 && (s += "text-decoration:underline;"), 256 !== F && (s += "background-color:" +
-                c.colors[F] + ";"), 257 !== x && (s += "color:" + c.colors[x] + ";"), s += '">'));
+            q !== x && (x !== this.defAttr && (s += "</span>"), q !== this.defAttr && (s += "<span ", -1 === q ? (s += 'class="terminal-cursor" ', L ? (F = t >> 9 & 511, x = t & 511) : (F = t & 511, x = t >> 9 & 511), A = t >> 18) : (F = q & 511, x = q >> 9 & 511, A = q >> 18), s += 'style="', !L && -1 === q && (s += "outline:1px solid " + Terminal.colors[x] + ";"), A & 1 && (Terminal.brokenBold || (s += "font-weight:bold;"), 8 > x && (x += 8)), A & 2 && (s += "text-decoration:underline;"), 256 !== F && (s += "background-color:" +
+                Terminal.colors[F] + ";"), 257 !== x && (s += "color:" + Terminal.colors[x] + ";"), s += '">'));
             switch (u) {
             case "&":
                 s += "&amp;";
@@ -530,16 +530,16 @@ c.prototype.refresh = function (a, k) {
     }
     H && H.appendChild(this.element)
 };
-c.prototype.redrawCursor = function () {
+Terminal.prototype.redrawCursor = function () {
     this.refresh(this.y, this.y)
 };
-c.prototype.showCursor = function () {
+Terminal.prototype.showCursor = function () {
     this.cursorState || (this.cursorState = 1);
     this.redrawCursor()
 };
-c.prototype.scroll = function () {
+Terminal.prototype.scroll = function () {
     var a;
-    ++this.ybase === c.scrollback &&
+    ++this.ybase === Terminal.scrollback &&
         (this.ybase = this.ybase / 2 | 0, this.lines = this.lines.slice(-(this.ybase + this.rows) + 1));
     this.ydisp = this.ybase;
     a = this.ybase + this.rows - 1;
@@ -549,13 +549,13 @@ c.prototype.scroll = function () {
     this.updateRange(this.scrollTop);
     this.updateRange(this.scrollBottom)
 };
-c.prototype.scrollDisp = function (a) {
+Terminal.prototype.scrollDisp = function (a) {
     this.ydisp += a;
     this.ydisp >
         this.ybase ? this.ydisp = this.ybase : 0 > this.ydisp && (this.ydisp = 0);
     this.refresh(0, this.rows - 1)
 };
-c.prototype.write = function (a) {
+Terminal.prototype.write = function (a) {
     var k = a.length,
         y = 0,
         f;
@@ -633,7 +633,7 @@ c.prototype.write = function (a) {
             break;
         case "%":
             this.setgLevel(0);
-            this.setgCharset(0, c.charsets.US);
+            this.setgCharset(0, Terminal.charsets.US);
             this.state = 0;
             y++;
             break;
@@ -721,53 +721,53 @@ c.prototype.write = function (a) {
     case 4:
         switch (f) {
         case "0":
-            f = c.charsets.SCLD;
+            f = Terminal.charsets.SCLD;
             break;
         case "A":
-            f = c.charsets.UK;
+            f = Terminal.charsets.UK;
             break;
         case "B":
-            f = c.charsets.US;
+            f = Terminal.charsets.US;
             break;
         case "4":
-            f = c.charsets.Dutch;
+            f = Terminal.charsets.Dutch;
             break;
         case "C":
         case "5":
-            f = c.charsets.Finnish;
+            f = Terminal.charsets.Finnish;
             break;
         case "R":
-            f = c.charsets.French;
+            f = Terminal.charsets.French;
             break;
         case "Q":
-            f = c.charsets.FrenchCanadian;
+            f = Terminal.charsets.FrenchCanadian;
             break;
         case "K":
-            f = c.charsets.German;
+            f = Terminal.charsets.German;
             break;
         case "Y":
-            f = c.charsets.Italian;
+            f = Terminal.charsets.Italian;
             break;
         case "E":
         case "6":
-            f = c.charsets.NorwegianDanish;
+            f = Terminal.charsets.NorwegianDanish;
             break;
         case "Z":
-            f = c.charsets.Spanish;
+            f = Terminal.charsets.Spanish;
             break;
         case "H":
         case "7":
-            f = c.charsets.Swedish;
+            f = Terminal.charsets.Swedish;
             break;
         case "=":
-            f = c.charsets.Swiss;
+            f = Terminal.charsets.Swiss;
             break;
         case "/":
-            f = c.charsets.ISOLatin;
+            f = Terminal.charsets.ISOLatin;
             y++;
             break;
         default:
-            f = c.charsets.US
+            f = Terminal.charsets.US
         }
         this.setgCharset(this.gcharset, f);
         this.gcharset = null;
@@ -968,10 +968,10 @@ c.prototype.write = function (a) {
     this.updateRange(this.y);
     this.refresh(this.refreshStart, this.refreshEnd)
 };
-c.prototype.writeln = function (a) {
+Terminal.prototype.writeln = function (a) {
     this.write(a + "\r\n")
 };
-c.prototype.keyDown = function (a) {
+Terminal.prototype.keyDown = function (a) {
     a = this.applyVirtualKey(a);
     var c = this,
         k = null;
@@ -1094,10 +1094,10 @@ c.prototype.keyDown = function (a) {
         break;
     default:
         if (a.ctrlKey && !a.altKey)!isMac && a.shiftKey && 86 === a.keyCode ? (k = "", v.setTimeout(function () {
-            c.commitInput("", a)
+            Terminal.commitInput("", a)
         }, 20)) : 65 <= a.keyCode && 90 >= a.keyCode ? k = H.fromCharCode(a.keyCode - 64) : 32 === a.keyCode ? k = H.fromCharCode(0) : 51 <= a.keyCode && 55 >= a.keyCode ? k = H.fromCharCode(a.keyCode - 51 + 27) : 56 === a.keyCode ? k = H.fromCharCode(127) : 219 === a.keyCode ? k = H.fromCharCode(27) : 221 === a.keyCode && (k = H.fromCharCode(29));
         else if (isMac && a.metaKey && 86 === a.keyCode) k = "", v.setTimeout(function () {
-            c.commitInput("", a)
+            Terminal.commitInput("", a)
         }, 20);
         else if (!a.ctrlKey && (!isMac && a.altKey || isMac && a.metaKey)) 65 <= a.keyCode && 90 >= a.keyCode ? k = "\u001b" + H.fromCharCode(a.keyCode + 32) : 192 === a.keyCode ? k = "\u001b`" : 48 <= a.keyCode && 57 >= a.keyCode && (k = "\u001b" + (a.keyCode - 48))
     }
@@ -1105,29 +1105,29 @@ c.prototype.keyDown = function (a) {
     "" !== k && this.showBufferedText();
     return !0
 };
-c.prototype.showBufferedText = function () {
+Terminal.prototype.showBufferedText = function () {
     var a = this.inputElement;
     v.setTimeout(function () {
         0 < a.value.length && -1 === a.className.indexOf(" visible") &&
             (a.className += " visible")
     }, 0)
 };
-c.prototype.commitInput = function (a, c) {
+Terminal.prototype.commitInput = function (a, c) {
     var k = this.inputElement.value;
     0 < k.length && (a = k + a, this.inputElement.value = "", this.inputElement.className = this.inputElement.className.replace(" visible", ""));
     this.emit("key", a, c);
     this.showCursor();
     this.handler(a)
 };
-c.prototype.setgLevel = function (a) {
+Terminal.prototype.setgLevel = function (a) {
     this.glevel = a;
     this.charset = this.charsets[a]
 };
-c.prototype.setgCharset = function (a, c) {
+Terminal.prototype.setgCharset = function (a, c) {
     this.charsets[a] = c;
     this.glevel === a && (this.charset = c)
 };
-c.prototype.keyPress = function (a) {
+Terminal.prototype.keyPress = function (a) {
     a = this.applyVirtualKey(a);
     var c;
     if (a.metaKey && 118 === a.charCode) return !1;
@@ -1138,37 +1138,37 @@ c.prototype.keyPress = function (a) {
     else return !1; if (c && !a.ctrlKey || c && a.altKey && a.ctrlKey || c && a.altKey || c && a.altGraphKey) c = H.fromCharCode(c), this.commitInput(c, a);
     return !1
 };
-c.prototype.send = function (a) {
+Terminal.prototype.send = function (a) {
     var c = this;
     this.queue || L(function () {
-        c.handler(c.queue);
-        c.queue = ""
+        Terminal.handler(Terminal.queue);
+        Terminal.queue = ""
     }, 1);
     this.queue += a
 };
-c.prototype.bell = function () {
-    if (c.visualBell) {
+Terminal.prototype.bell = function () {
+    if (Terminal.visualBell) {
         var a = this;
         this.element.style.borderColor = "white";
         L(function () {
             a.element.style.borderColor = ""
         }, 10);
-        c.popOnBell && this.focus()
+        Terminal.popOnBell && this.focus()
     }
 };
-c.prototype.log = function () {
-    if (c.debug && v.console && v.console.log) {
+Terminal.prototype.log = function () {
+    if (Terminal.debug && v.console && v.console.log) {
         var a = Array.prototype.slice.call(arguments);
         v.console.log.apply(v.console, a)
     }
 };
-c.prototype.error = function () {
-    if (c.debug && v.console && v.console.error) {
+Terminal.prototype.error = function () {
+    if (Terminal.debug && v.console && v.console.error) {
         var a = Array.prototype.slice.call(arguments);
         v.console.error.apply(v.console, a)
     }
 };
-c.prototype.resize = function (a, c) {
+Terminal.prototype.resize = function (a, c) {
     var k, f, v;
     1 > a && (a = 1);
     1 > c && (c = 1);
@@ -1199,7 +1199,7 @@ c.prototype.resize = function (a, c) {
     this.showSize(a, c);
     this.emit("resize", a, c)
 };
-c.prototype.showSize = function (a, c) {
+Terminal.prototype.showSize = function (a, c) {
     var k = this.sizeIndicatorElement;
     k.innerHTML = a + "x" + c;
     k.style.display = "block";
@@ -1208,107 +1208,107 @@ c.prototype.showSize = function (a, c) {
         k.style.display = "none"
     }, 2E3)
 };
-c.prototype.updateRange =
+Terminal.prototype.updateRange =
     function (a) {
         a < this.refreshStart && (this.refreshStart = a);
         a > this.refreshEnd && (this.refreshEnd = a)
 };
-c.prototype.maxRange = function () {
+Terminal.prototype.maxRange = function () {
     this.refreshStart = 0;
     this.refreshEnd = this.rows - 1
 };
-c.prototype.setupStops = function (a) {
+Terminal.prototype.setupStops = function (a) {
     null != a ? this.tabs[a] || (a = this.prevStop(a)) : (this.tabs = {}, a = 0);
     for (; a < this.cols; a += 8) this.tabs[a] = !0
 };
-c.prototype.prevStop = function (a) {
+Terminal.prototype.prevStop = function (a) {
     null == a && (a = this.x);
     for (; !this.tabs[--a] && 0 < a;);
     return a >= this.cols ? this.cols - 1 : 0 > a ? 0 : a
 };
-c.prototype.nextStop = function (a) {
+Terminal.prototype.nextStop = function (a) {
     null == a && (a = this.x);
     for (; !this.tabs[++a] &&
         a < this.cols;);
     return a >= this.cols ? this.cols - 1 : 0 > a ? 0 : a
 };
-c.prototype.eraseRight = function (a, c) {
+Terminal.prototype.eraseRight = function (a, c) {
     for (var k = this.lines[this.ybase + c], f = [this.curAttr, " "]; a < this.cols; a++) k[a] = f;
     this.updateRange(c)
 };
-c.prototype.eraseLeft = function (a, c) {
+Terminal.prototype.eraseLeft = function (a, c) {
     var k = this.lines[this.ybase + c],
         f = [this.curAttr, " "];
     for (a++; a--;) k[a] = f;
     this.updateRange(c)
 };
-c.prototype.eraseLine = function (a) {
+Terminal.prototype.eraseLine = function (a) {
     this.eraseRight(0, a)
 };
-c.prototype.blankLine = function (a) {
+Terminal.prototype.blankLine = function (a) {
     a = [a ? this.curAttr : this.defAttr, " "];
     for (var c = [], k = 0; k < this.cols; k++) c[k] = a;
     return c
 };
-c.prototype.ch =
+Terminal.prototype.ch =
     function (a) {
         return a ? [this.curAttr, " "] : [this.defAttr, " "]
 };
-c.prototype.is = function (a) {
-    return 0 === ((this.termName || c.termName) + "").indexOf(a)
+Terminal.prototype.is = function (a) {
+    return 0 === ((this.termName || Terminal.termName) + "").indexOf(a)
 };
-c.prototype.handler = function (a) {
+Terminal.prototype.handler = function (a) {
     this.emit("data", a)
 };
-c.prototype.handleTitle = function (a) {
+Terminal.prototype.handleTitle = function (a) {
     this.emit("title", a)
 };
-c.prototype.index = function () {
+Terminal.prototype.index = function () {
     this.y++;
     this.y > this.scrollBottom && (this.y--, this.scroll());
     this.state = 0
 };
-c.prototype.reverseIndex = function () {
+Terminal.prototype.reverseIndex = function () {
     var a;
     this.y--;
     this.y < this.scrollTop && (this.y++, this.lines.splice(this.y + this.ybase, 0, this.blankLine(!0)), a =
         this.rows - 1 - this.scrollBottom, this.lines.splice(this.rows - 1 + this.ybase - a + 1, 1), this.updateRange(this.scrollTop), this.updateRange(this.scrollBottom));
     this.state = 0
 };
-c.prototype.reset = function () {
-    c.call(this, this.cols, this.rows);
+Terminal.prototype.reset = function () {
+    Terminal.call(this, this.cols, this.rows);
     this.refresh(0, this.rows - 1)
 };
-c.prototype.tabSet = function () {
+Terminal.prototype.tabSet = function () {
     this.tabs[this.x] = !0;
     this.state = 0
 };
-c.prototype.cursorUp = function (a) {
+Terminal.prototype.cursorUp = function (a) {
     a = a[0];
     1 > a && (a = 1);
     this.y -= a;
     0 > this.y && (this.y = 0)
 };
-c.prototype.cursorDown = function (a) {
+Terminal.prototype.cursorDown = function (a) {
     a = a[0];
     1 > a && (a = 1);
     this.y += a;
     this.y >= this.rows && (this.y = this.rows -
         1)
 };
-c.prototype.cursorForward = function (a) {
+Terminal.prototype.cursorForward = function (a) {
     a = a[0];
     1 > a && (a = 1);
     this.x += a;
     this.x >= this.cols && (this.x = this.cols - 1)
 };
-c.prototype.cursorBackward = function (a) {
+Terminal.prototype.cursorBackward = function (a) {
     a = a[0];
     1 > a && (a = 1);
     this.x -= a;
     0 > this.x && (this.x = 0)
 };
-c.prototype.cursorPos = function (a) {
+Terminal.prototype.cursorPos = function (a) {
     var c;
     c = a[0] - 1;
     a = 2 <= a.length ? a[1] - 1 : 0;
@@ -1317,7 +1317,7 @@ c.prototype.cursorPos = function (a) {
     this.x = a;
     this.y = c
 };
-c.prototype.eraseInDisplay = function (a) {
+Terminal.prototype.eraseInDisplay = function (a) {
     switch (a[0]) {
     case 0:
         this.eraseRight(this.x, this.y);
@@ -1331,7 +1331,7 @@ c.prototype.eraseInDisplay = function (a) {
         for (a = this.rows; a--;) this.eraseLine(a)
     }
 };
-c.prototype.eraseInLine = function (a) {
+Terminal.prototype.eraseInLine = function (a) {
     switch (a[0]) {
     case 0:
         this.eraseRight(this.x, this.y);
@@ -1343,7 +1343,7 @@ c.prototype.eraseInLine = function (a) {
         this.eraseLine(this.y)
     }
 };
-c.prototype.charAttributes = function (a) {
+Terminal.prototype.charAttributes = function (a) {
     for (var c = a.length, k = 0, f, v; k < c; k++)
         if (f = a[k], 30 <= f && 37 >= f) this.curAttr = this.curAttr & -261633 | f - 30 << 9;
         else if (40 <= f && 47 >= f) this.curAttr = this.curAttr & -512 | f - 40;
@@ -1367,7 +1367,7 @@ c.prototype.charAttributes = function (a) {
     } else 22 === f ? this.curAttr &= -262145 :
         24 === f ? this.curAttr &= -524289 : 39 === f ? (this.curAttr &= -261633, this.curAttr |= (this.defAttr >> 9 & 511) << 9) : 49 === f ? (this.curAttr &= -512, this.curAttr |= this.defAttr & 511) : 38 === f ? 5 === a[k + 1] && (k += 2, f = a[k] & 255, this.curAttr = this.curAttr & -261633 | f << 9) : 48 === f && 5 === a[k + 1] && (k += 2, f = a[k] & 255, this.curAttr = this.curAttr & -512 | f)
 };
-c.prototype.deviceStatus = function (a) {
+Terminal.prototype.deviceStatus = function (a) {
     if (this.prefix) {
         if ("?" === this.prefix) switch (a[0]) {
         case 6:
@@ -1381,7 +1381,7 @@ c.prototype.deviceStatus = function (a) {
         this.send("\u001b[" + (this.y + 1) + ";" + (this.x + 1) + "R")
     }
 };
-c.prototype.insertChars = function (a) {
+Terminal.prototype.insertChars = function (a) {
     var c, k, f;
     a = a[0];
     1 > a && (a = 1);
@@ -1389,27 +1389,27 @@ c.prototype.insertChars = function (a) {
     k = this.x;
     for (f = [this.curAttr, " "]; a-- && k < this.cols;) this.lines[c].splice(k++, 0, f), this.lines[c].pop()
 };
-c.prototype.cursorNextLine = function (a) {
+Terminal.prototype.cursorNextLine = function (a) {
     a = a[0];
     1 > a && (a = 1);
     this.y += a;
     this.y >= this.rows && (this.y = this.rows - 1);
     this.x = 0
 };
-c.prototype.cursorPrecedingLine = function (a) {
+Terminal.prototype.cursorPrecedingLine = function (a) {
     a = a[0];
     1 > a && (a = 1);
     this.y -= a;
     0 > this.y && (this.y = 0);
     this.x = 0
 };
-c.prototype.cursorCharAbsolute =
+Terminal.prototype.cursorCharAbsolute =
     function (a) {
         a = a[0];
         1 > a && (a = 1);
         this.x = a - 1
 };
-c.prototype.insertLines = function (a) {
+Terminal.prototype.insertLines = function (a) {
     var c, k;
     a = a[0];
     1 > a && (a = 1);
@@ -1419,7 +1419,7 @@ c.prototype.insertLines = function (a) {
     this.updateRange(this.y);
     this.updateRange(this.scrollBottom)
 };
-c.prototype.deleteLines = function (a) {
+Terminal.prototype.deleteLines = function (a) {
     var c, k;
     a = a[0];
     1 > a && (a = 1);
@@ -1430,14 +1430,14 @@ c.prototype.deleteLines = function (a) {
     this.updateRange(this.y);
     this.updateRange(this.scrollBottom)
 };
-c.prototype.deleteChars = function (a) {
+Terminal.prototype.deleteChars = function (a) {
     var c, k;
     a = a[0];
     1 > a && (a = 1);
     c = this.y + this.ybase;
     for (k = [this.curAttr, " "]; a--;) this.lines[c].splice(this.x, 1), this.lines[c].push(k)
 };
-c.prototype.eraseChars = function (a) {
+Terminal.prototype.eraseChars = function (a) {
     var c, k, f;
     a = a[0];
     1 > a && (a = 1);
@@ -1445,36 +1445,36 @@ c.prototype.eraseChars = function (a) {
     k = this.x;
     for (f = [this.curAttr, " "]; a-- && k < this.cols;) this.lines[c][k++] = f
 };
-c.prototype.charPosAbsolute = function (a) {
+Terminal.prototype.charPosAbsolute = function (a) {
     a = a[0];
     1 > a && (a = 1);
     this.x = a - 1;
     this.x >= this.cols && (this.x =
         this.cols - 1)
 };
-c.prototype.HPositionRelative = function (a) {
+Terminal.prototype.HPositionRelative = function (a) {
     a = a[0];
     1 > a && (a = 1);
     this.x += a;
     this.x >= this.cols && (this.x = this.cols - 1)
 };
-c.prototype.sendDeviceAttributes = function (a) {
+Terminal.prototype.sendDeviceAttributes = function (a) {
     0 < a[0] || (this.prefix ? ">" === this.prefix && (this.is("xterm") ? this.send("\u001b[>0;276;0c") : this.is("rxvt-unicode") ? this.send("\u001b[>85;95;0c") : this.is("linux") ? this.send(a[0] + "c") : this.is("screen") && this.send("\u001b[>83;40003;0c")) : this.is("xterm") || this.is("rxvt-unicode") || this.is("screen") ? this.send("\u001b[?1;2c") : this.is("linux") &&
         this.send("\u001b[?6c"))
 };
-c.prototype.linePosAbsolute = function (a) {
+Terminal.prototype.linePosAbsolute = function (a) {
     a = a[0];
     1 > a && (a = 1);
     this.y = a - 1;
     this.y >= this.rows && (this.y = this.rows - 1)
 };
-c.prototype.VPositionRelative = function (a) {
+Terminal.prototype.VPositionRelative = function (a) {
     a = a[0];
     1 > a && (a = 1);
     this.y += a;
     this.y >= this.rows && (this.y = this.rows - 1)
 };
-c.prototype.HVPosition = function (a) {
+Terminal.prototype.HVPosition = function (a) {
     1 > a[0] && (a[0] = 1);
     1 > a[1] && (a[1] = 1);
     this.y = a[0] - 1;
@@ -1482,7 +1482,7 @@ c.prototype.HVPosition = function (a) {
     this.x = a[1] - 1;
     this.x >= this.cols && (this.x = this.cols - 1)
 };
-c.prototype.setMode = function (a) {
+Terminal.prototype.setMode = function (a) {
     if ("object" === typeof a)
         for (var k = a.length, v =
                 0; v < k; v++) this.setMode(a[v]);
@@ -1492,10 +1492,10 @@ c.prototype.setMode = function (a) {
             this.applicationCursor = !0;
             break;
         case 2:
-            this.setgCharset(0, c.charsets.US);
-            this.setgCharset(1, c.charsets.US);
-            this.setgCharset(2, c.charsets.US);
-            this.setgCharset(3, c.charsets.US);
+            this.setgCharset(0, Terminal.charsets.US);
+            this.setgCharset(1, Terminal.charsets.US);
+            this.setgCharset(2, Terminal.charsets.US);
+            this.setgCharset(3, Terminal.charsets.US);
             break;
         case 3:
             this.savedCols = this.cols;
@@ -1553,7 +1553,7 @@ c.prototype.setMode = function (a) {
         this.insertMode = !0
     }
 };
-c.prototype.resetMode = function (a) {
+Terminal.prototype.resetMode = function (a) {
     if ("object" === typeof a)
         for (var c = a.length, k = 0; k < c; k++) this.resetMode(a[k]);
     else if (this.prefix) {
@@ -1605,50 +1605,50 @@ c.prototype.resetMode = function (a) {
         this.insertMode = !1
     }
 };
-c.prototype.setScrollRegion = function (a) {
+Terminal.prototype.setScrollRegion = function (a) {
     this.prefix || (this.scrollTop = (a[0] || 1) - 1, this.scrollBottom = (a[1] || this.rows) - 1, this.y = this.x = 0)
 };
-c.prototype.saveCursor = function (a) {
+Terminal.prototype.saveCursor = function (a) {
     this.savedX = this.x;
     this.savedY = this.y
 };
-c.prototype.restoreCursor = function (a) {
+Terminal.prototype.restoreCursor = function (a) {
     this.x = this.savedX || 0;
     this.y = this.savedY || 0
 };
-c.prototype.cursorForwardTab = function (a) {
+Terminal.prototype.cursorForwardTab = function (a) {
     for (a = a[0] || 1; a--;) this.x = this.nextStop()
 };
-c.prototype.scrollUp = function (a) {
+Terminal.prototype.scrollUp = function (a) {
     for (a = a[0] || 1; a--;) this.lines.splice(this.ybase +
         this.scrollTop, 1), this.lines.splice(this.ybase + this.scrollBottom, 0, this.blankLine());
     this.updateRange(this.scrollTop);
     this.updateRange(this.scrollBottom)
 };
-c.prototype.scrollDown = function (a) {
+Terminal.prototype.scrollDown = function (a) {
     for (a = a[0] || 1; a--;) this.lines.splice(this.ybase + this.scrollBottom, 1), this.lines.splice(this.ybase + this.scrollTop, 0, this.blankLine());
     this.updateRange(this.scrollTop);
     this.updateRange(this.scrollBottom)
 };
-c.prototype.initMouseTracking = function (a) {};
-c.prototype.resetTitleModes = function (a) {};
-c.prototype.cursorBackwardTab =
+Terminal.prototype.initMouseTracking = function (a) {};
+Terminal.prototype.resetTitleModes = function (a) {};
+Terminal.prototype.cursorBackwardTab =
     function (a) {
         for (a = a[0] || 1; a--;) this.x = this.prevStop()
 };
-c.prototype.repeatPrecedingCharacter = function (a) {
+Terminal.prototype.repeatPrecedingCharacter = function (a) {
     a = a[0] || 1;
     for (var c = this.lines[this.ybase + this.y], k = c[this.x - 1] || [this.defAttr, " "]; a--;) c[this.x++] = k
 };
-c.prototype.tabClear = function (a) {
+Terminal.prototype.tabClear = function (a) {
     a = a[0];
     0 >= a ? delete this.tabs[this.x] : 3 === a && (this.tabs = {})
 };
-c.prototype.mediaCopy = function (a) {};
-c.prototype.setResources = function (a) {};
-c.prototype.disableModifiers = function (a) {};
-c.prototype.setPointerMode = function (a) {};
-c.prototype.softReset = function (a) {
+Terminal.prototype.mediaCopy = function (a) {};
+Terminal.prototype.setResources = function (a) {};
+Terminal.prototype.disableModifiers = function (a) {};
+Terminal.prototype.setPointerMode = function (a) {};
+Terminal.prototype.softReset = function (a) {
     this.applicationCursor =
         this.applicationKeypad = this.wraparoundMode = this.originMode = this.insertMode = this.cursorHidden = !1;
     this.scrollTop = 0;
@@ -1659,15 +1659,15 @@ c.prototype.softReset = function (a) {
     this.glevel = 0;
     this.charsets = [null]
 };
-c.prototype.requestAnsiMode = function (a) {};
-c.prototype.requestPrivateMode = function (a) {};
-c.prototype.setConformanceLevel = function (a) {};
-c.prototype.loadLEDs = function (a) {};
-c.prototype.setCursorStyle = function (a) {};
-c.prototype.setCharProtectionAttr = function (a) {};
-c.prototype.restorePrivateValues =
+Terminal.prototype.requestAnsiMode = function (a) {};
+Terminal.prototype.requestPrivateMode = function (a) {};
+Terminal.prototype.setConformanceLevel = function (a) {};
+Terminal.prototype.loadLEDs = function (a) {};
+Terminal.prototype.setCursorStyle = function (a) {};
+Terminal.prototype.setCharProtectionAttr = function (a) {};
+Terminal.prototype.restorePrivateValues =
     function (a) {};
-c.prototype.setAttrInRectangle = function (a) {
+Terminal.prototype.setAttrInRectangle = function (a) {
     for (var c = a[0], k = a[1], f = a[2], v = a[3], s = a[4], z, u; c < f + 1; c++) {
         z = this.lines[this.ybase + c];
         for (u = k; u < v; u++) z[u] = [s, z[u][1]]
@@ -1675,18 +1675,18 @@ c.prototype.setAttrInRectangle = function (a) {
     this.updateRange(a[0]);
     this.updateRange(a[2])
 };
-c.prototype.savePrivateValues = function (a) {};
-c.prototype.manipulateWindow = function (a) {};
-c.prototype.reverseAttrInRectangle = function (a) {};
-c.prototype.setTitleModeFeature = function (a) {};
-c.prototype.setWarningBellVolume = function (a) {};
-c.prototype.setMarginBellVolume = function (a) {};
-c.prototype.copyRectangle =
+Terminal.prototype.savePrivateValues = function (a) {};
+Terminal.prototype.manipulateWindow = function (a) {};
+Terminal.prototype.reverseAttrInRectangle = function (a) {};
+Terminal.prototype.setTitleModeFeature = function (a) {};
+Terminal.prototype.setWarningBellVolume = function (a) {};
+Terminal.prototype.setMarginBellVolume = function (a) {};
+Terminal.prototype.copyRectangle =
     function (a) {};
-c.prototype.enableFilterRectangle = function (a) {};
-c.prototype.requestParameters = function (a) {};
-c.prototype.selectChangeExtent = function (a) {};
-c.prototype.fillRectangle = function (a) {
+Terminal.prototype.enableFilterRectangle = function (a) {};
+Terminal.prototype.requestParameters = function (a) {};
+Terminal.prototype.selectChangeExtent = function (a) {};
+Terminal.prototype.fillRectangle = function (a) {
     for (var c = a[0], k = a[1], f = a[2], v = a[3], s = a[4], z, u; k < v + 1; k++) {
         z = this.lines[this.ybase + k];
         for (u = f; u < s; u++) z[u] = [z[u][0], H.fromCharCode(c)]
@@ -1694,8 +1694,8 @@ c.prototype.fillRectangle = function (a) {
     this.updateRange(a[1]);
     this.updateRange(a[3])
 };
-c.prototype.enableLocatorReporting = function (a) {};
-c.prototype.eraseRectangle = function (a) {
+Terminal.prototype.enableLocatorReporting = function (a) {};
+Terminal.prototype.eraseRectangle = function (a) {
     var c = a[0],
         k = a[1],
         f = a[2],
@@ -1708,22 +1708,22 @@ c.prototype.eraseRectangle = function (a) {
     this.updateRange(a[0]);
     this.updateRange(a[2])
 };
-c.prototype.setLocatorEvents = function (a) {};
-c.prototype.selectiveEraseRectangle = function (a) {};
-c.prototype.requestLocatorPosition = function (a) {};
-c.prototype.insertColumns = function () {
+Terminal.prototype.setLocatorEvents = function (a) {};
+Terminal.prototype.selectiveEraseRectangle = function (a) {};
+Terminal.prototype.requestLocatorPosition = function (a) {};
+Terminal.prototype.insertColumns = function () {
     for (var a = params[0], c = this.ybase + this.rows, k = [this.curAttr, " "], f; a--;)
         for (f = this.ybase; f < c; f++) this.lines[f].splice(this.x + 1, 0, k), this.lines[f].pop();
     this.maxRange()
 };
-c.prototype.deleteColumns = function () {
+Terminal.prototype.deleteColumns = function () {
     for (var a =
         params[0], c = this.ybase + this.rows, k = [this.curAttr, " "], f; a--;)
         for (f = this.ybase; f < c; f++) this.lines[f].splice(this.x, 1), this.lines[f].push(k);
     this.maxRange()
 };
-c.charsets = {};
-c.charsets.SCLD = {
+Terminal.charsets = {};
+Terminal.charsets.SCLD = {
     "`": "\u25c6",
     a: "\u2592",
     b: "\t",
@@ -1756,28 +1756,28 @@ c.charsets.SCLD = {
     "}": "\u00a3",
     "~": "\u00b7"
 };
-c.charsets.UK = null;
-c.charsets.US = null;
-c.charsets.Dutch = null;
-c.charsets.Finnish = null;
-c.charsets.French = null;
-c.charsets.FrenchCanadian = null;
-c.charsets.German = null;
-c.charsets.Italian = null;
-c.charsets.NorwegianDanish = null;
-c.charsets.Spanish = null;
-c.charsets.Swedish = null;
-c.charsets.Swiss = null;
-c.charsets.ISOLatin = null;
+Terminal.charsets.UK = null;
+Terminal.charsets.US = null;
+Terminal.charsets.Dutch = null;
+Terminal.charsets.Finnish = null;
+Terminal.charsets.French = null;
+Terminal.charsets.FrenchCanadian = null;
+Terminal.charsets.German = null;
+Terminal.charsets.Italian = null;
+Terminal.charsets.NorwegianDanish = null;
+Terminal.charsets.Spanish = null;
+Terminal.charsets.Swedish = null;
+Terminal.charsets.Swiss = null;
+Terminal.charsets.ISOLatin = null;
 var isMac = ~navigator.userAgent.indexOf("Mac"),
     H = this.String,
     L = this.setTimeout;
-c.EventEmitter = EventEmitter;
-c.isMac = isMac;
-c.on = on;
-c.off = off;
-c.cancel = cancel;
+Terminal.EventEmitter = EventEmitter;
+Terminal.isMac = isMac;
+Terminal.on = on;
+Terminal.off = off;
+Terminal.cancel = cancel;
 
-exports.Terminal = c;
+exports.Terminal = Terminal;
 
 })('object' === typeof module ? module.exports : (this.terminal = {}), this);
