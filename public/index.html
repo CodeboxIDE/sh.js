@@ -23,9 +23,9 @@
                 term.write(data.content);
             });
 
-            term.handler = function (c) {
+            term.on("data", function (c) {
                 socket.emit('input', { content: c });
-            };
+            });
 
             term.on("resize", function (c, k) {
                 socket.emit("resize", {
