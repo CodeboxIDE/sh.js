@@ -1,11 +1,16 @@
 {
-    "name": "terminal.js",
-    "devDependencies": {
-        "grunt": "~0.4.2",
-        "grunt-contrib-requirejs": "0.4.1",
-        "grunt-contrib-concat": "0.3.0",
+    "name": "sh.js",
+    "dependencies": {
         "socket.io": "0.9.16",
         "express": "3.4.8",
         "pty.js": "0.2.3"
+    },
+    "devDependencies": {
+        "grunt": "~0.4.2",
+        "grunt-contrib-requirejs": "0.4.1",
+        "grunt-contrib-concat": "0.3.0"
+    },
+    "scripts": {
+        "start": "node ./main.js"
     }
 }

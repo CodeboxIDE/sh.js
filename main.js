@@ -8,8 +8,7 @@ var app = express();
  
 app.configure(function () {
     app.use(express.cookieParser());
-    app.use(express.static(__dirname + '/../build'));
-    app.use(express.static(__dirname + '/../examples'));
+    app.use(express.static(__dirname + '/public'));
 });
  
 var server = http.createServer(app).listen(5000);

@@ -20,7 +20,7 @@ module.exports = function (grunt) {
                 src: [
                     'src/index.js'
                 ],
-                dest: 'build/terminal.js',
+                dest: 'public/terminal.js',
             },
         }
     });
