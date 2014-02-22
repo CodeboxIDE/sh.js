@@ -1,10 +1,6 @@
 
-function q() {
-    this._events = this._events || {}
-}
-
 function c(a, k, y) {
-    q.call(this);
+    EventEmitter.call(this);
     var f;
     "object" === typeof a && (f = a, a = f.cols, k = f.rows, y = f.handler);
     this._options = f || {};
@@ -89,40 +85,8 @@ function A() {
 var v = this,
     z = this.document,
     s = 1;
-q.prototype.addListener = function (a, c) {
-    this._events[a] = this._events[a] || [];
-    this._events[a].push(c)
-};
-q.prototype.on = q.prototype.addListener;
-q.prototype.removeListener = function (a, c) {
-    if (this._events[a])
-        for (var k = this._events[a], f = k.length; f--;)
-            if (k[f] === c || k[f].listener === c) {
-                k.splice(f, 1);
-                break
-            }
-};
-q.prototype.off = q.prototype.removeListener;
-q.prototype.removeAllListeners = function (a) {
-    this._events[a] && delete this._events[a]
-};
-q.prototype.once = function (a, c) {
-    function k() {
-        var f = Array.prototype.slice.call(arguments);
-        this.removeListener(a, k);
-        return c.apply(this, f)
-    }
-    k.listener = c;
-    return this.on(a, k)
-};
-q.prototype.emit = function (a) {
-    if (this._events[a])
-        for (var c = Array.prototype.slice.call(arguments, 1), k = this._events[a], f = k.length, v = 0; v < f; v++) k[v].apply(this, c)
-};
-q.prototype.listeners = function (a) {
-    return this._events[a] = this._events[a] || []
-};
-u(c, q);
+
+u(c, EventEmitter);
 c.colors =
     "#000000 #c81908 #00c01d #c8c221 #0033c5 #c73ac5 #00c6c7 #c7c7c7 #686868 #8a8a8a #67f86e #fff970 #6678fc #ff7cfd #65fdff #ffffff".split(" ");
 c.colors = function () {
@@ -1766,7 +1730,7 @@ c.charsets.ISOLatin = null;
 var F = ~navigator.userAgent.indexOf("Mac"),
     H = this.String,
     L = this.setTimeout;
-c.EventEmitter = q;
+c.EventEmitter = EventEmitter;
 c.isMac = F;
 c.inherits = u;
 c.on = k;
