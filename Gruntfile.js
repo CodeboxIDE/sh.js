@@ -5,31 +5,25 @@ module.exports = function (grunt) {
     var clientPath = path.resolve(__dirname, "client");
 
     // Load NPM tasks
-    grunt.loadNpmTasks('grunt-contrib-concat');
+    grunt.loadNpmTasks('grunt-browserify');
 
     // Init GRUNT configuraton
     grunt.initConfig({
         pkg: grunt.file.readJSON('package.json'),
-        concat: {
-            options: {
-                separator: ';',
-                banner: "(function (exports, global) {",
-                footer: "})('object' === typeof module ? module.exports : (this.terminal = {}), this);"
-            },
-            build: {
-                src: [
-                    'src/event.js',
-                    'src/utils.js',
-                    'src/index.js'
-                ],
-                dest: 'public/terminal.js',
-            },
+        browserify: {
+            dist: {
+                src: 'src/index.js',
+                dest: 'public/sh.js',
+                options: {
+                    standalone: "Terminal"
+                }
+            }
         }
     });
 
     // Build
     grunt.registerTask('build', [
-        'concat:build'
+        'browserify'
     ]);
 
     grunt.registerTask('default', [

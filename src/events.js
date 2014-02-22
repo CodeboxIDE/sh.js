@@ -58,3 +58,10 @@ function cancel(a) {
     a.cancelBubble = !0;
     return !1
 }
+
+module.exports= {
+    'EventEmitter': EventEmitter,
+    'on': on,
+    'off': off,
+    'cancel': cancel
+};

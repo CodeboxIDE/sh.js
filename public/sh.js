@@ -1,5 +1,74 @@
-var events = require("./events");
-var utils = require("./utils");
+!function(e){if("object"==typeof exports)module.exports=e();else if("function"==typeof define&&define.amd)define(e);else{var f;"undefined"!=typeof window?f=window:"undefined"!=typeof global?f=global:"undefined"!=typeof self&&(f=self),f.Terminal=e()}}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
+function EventEmitter() {
+    this._events = this._events || {}
+}
+
+EventEmitter.prototype.addListener = function (a, c) {
+    this._events[a] = this._events[a] || [];
+    this._events[a].push(c)
+};
+
+EventEmitter.prototype.removeListener = function (a, c) {
+    if (this._events[a])
+        for (var k = this._events[a], f = k.length; f--;)
+            if (k[f] === c || k[f].listener === c) {
+                k.splice(f, 1);
+                break
+            }
+};
+
+EventEmitter.prototype.on = EventEmitter.prototype.addListener;
+EventEmitter.prototype.off = EventEmitter.prototype.removeListener;
+
+
+EventEmitter.prototype.removeAllListeners = function (a) {
+    this._events[a] && delete this._events[a]
+};
+
+EventEmitter.prototype.once = function (a, c) {
+    function k() {
+        var f = Array.prototype.slice.call(arguments);
+        this.removeListener(a, k);
+        return c.apply(this, f)
+    }
+    k.listener = c;
+    return this.on(a, k)
+};
+
+EventEmitter.prototype.emit = function (a) {
+    if (this._events[a])
+        for (var c = Array.prototype.slice.call(arguments, 1), k = this._events[a], f = k.length, v = 0; v < f; v++) k[v].apply(this, c)
+};
+
+EventEmitter.prototype.listeners = function (a) {
+    return this._events[a] = this._events[a] || []
+};
+
+function on(a, c, k, f) {
+    a.addEventListener(c, k, f || !1)
+}
+
+function off(a, c, k, f) {
+    a.removeEventListener(c, k, f || !1)
+}
+
+function cancel(a) {
+    a.preventDefault && a.preventDefault();
+    a.returnValue = !1;
+    a.stopPropagation && a.stopPropagation();
+    a.cancelBubble = !0;
+    return !1
+}
+
+module.exports= {
+    'EventEmitter': EventEmitter,
+    'on': on,
+    'off': off,
+    'cancel': cancel
+};
+},{}],2:[function(_dereq_,module,exports){
+var events = _dereq_("./events");
+var utils = _dereq_("./utils");
 
 function Terminal(a, k, y) {
     events.EventEmitter.call(this);
@@ -1702,3 +1771,31 @@ Terminal.isMac = isMac;
 
 
 module.exports = Terminal;
+},{"./events":1,"./utils":3}],3:[function(_dereq_,module,exports){
+function inherits(a, c) {
+    function k() {
+        this.constructor = a
+    }
+    k.prototype = c.prototype;
+    a.prototype = new k
+}
+
+function isBoldBroken() {
+    var a = document.createElement("span");
+    a.innerHTML =
+        "hello world";
+    document.body.appendChild(a);
+    var c = a.scrollWidth;
+    a.style.fontWeight = "bold";
+    var k = a.scrollWidth;
+    document.body.removeChild(a);
+    return c !== k
+}
+
+module.exports = {
+    'inherits': inherits,
+    'isBoldBroken': isBoldBroken
+};
+},{}]},{},[2])
+(2)
+});

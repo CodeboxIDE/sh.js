@@ -7,13 +7,18 @@ function inherits(a, c) {
 }
 
 function isBoldBroken() {
-    var a = z.createElement("span");
+    var a = document.createElement("span");
     a.innerHTML =
         "hello world";
-    z.body.appendChild(a);
+    document.body.appendChild(a);
     var c = a.scrollWidth;
     a.style.fontWeight = "bold";
     var k = a.scrollWidth;
-    z.body.removeChild(a);
+    document.body.removeChild(a);
     return c !== k
 }
+
+module.exports = {
+    'inherits': inherits,
+    'isBoldBroken': isBoldBroken
+};
