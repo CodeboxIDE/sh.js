@@ -1,0 +1,54 @@
+<html>
+    <head>
+        <link rel="stylesheet" type="text/css" href="style.css">
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
+        <script src="/socket.io/socket.io.js"></script>
+        <script type="text/javascript" src="/terminal.js"></script>
+    </head>
+    <body>
+        <script>
+        $(document).ready(function() {
+            var term = new terminal.Terminal(80, 6);
+            term.open();
+            term.sizeToFit();
+
+            var socket = io.connect('http://localhost');
+            socket.on('connect', function() {
+                socket.emit("resize", {
+                    'w': term.cols,
+                    'h': term.rows
+                });
+            });
+            socket.on('output', function (data) {
+                term.write(data.content);
+            });
+
+            term.handler = function (c) {
+                socket.emit('input', { content: c });
+            };
+
+            term.on("resize", function (c, k) {
+                socket.emit("resize", {
+                    'w': c,
+                    'h': k
+                });
+            });
+
+            window.onresize = function () {
+                return term.sizeToFit();
+            };
+
+            $(window).focus(function () {
+                return term.focus()
+            });
+            $(window).on("touchstart", function (c) {
+                return term.focus()
+            });
+            $(window).on("touchend", function () {
+                return term.focus()
+            });
+            term.element.focus();
+        });
+        </script>
+    </body>
+</html>
