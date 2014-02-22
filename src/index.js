@@ -48,17 +48,6 @@ function Terminal(a, k, y) {
     this.setupStops()
 }
 
-function A() {
-    var a = z.createElement("span");
-    a.innerHTML =
-        "hello world";
-    z.body.appendChild(a);
-    var c = a.scrollWidth;
-    a.style.fontWeight = "bold";
-    var k = a.scrollWidth;
-    z.body.removeChild(a);
-    return c !== k
-}
 var v = this,
     z = this.document,
     s = 1;
@@ -264,7 +253,7 @@ Terminal.prototype.open =
             }, 20)
         });
         this.bindMouse();
-        null == Terminal.brokenBold && (Terminal.brokenBold = A());
+        null == Terminal.brokenBold && (Terminal.brokenBold = isBoldBroken());
         this.element.style.backgroundColor = Terminal.defaultColors.bg;
         this.element.style.color = Terminal.defaultColors.fg
 };
