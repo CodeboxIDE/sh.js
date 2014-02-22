@@ -57,9 +57,16 @@ function cancel(a) {
     a.stopPropagation && a.stopPropagation();
     a.cancelBubble = !0;
     return !1
+};function inherits(a, c) {
+    function k() {
+        this.constructor = a
+    }
+    k.prototype = c.prototype;
+    a.prototype = new k
 };
 function c(a, k, y) {
     EventEmitter.call(this);
+
     var f;
     "object" === typeof a && (f = a, a = f.cols, k = f.rows, y = f.handler);
     this._options = f || {};
@@ -106,14 +113,6 @@ function c(a, k, y) {
     this.setupStops()
 }
 
-function u(a, c) {
-    function k() {
-        this.constructor = a
-    }
-    k.prototype = c.prototype;
-    a.prototype = new k
-}
-
 function A() {
     var a = z.createElement("span");
     a.innerHTML =
@@ -129,7 +128,7 @@ var v = this,
     z = this.document,
     s = 1;
 
-u(c, EventEmitter);
+inherits(c, EventEmitter);
 c.colors =
     "#000000 #c81908 #00c01d #c8c221 #0033c5 #c73ac5 #00c6c7 #c7c7c7 #686868 #8a8a8a #67f86e #fff970 #6678fc #ff7cfd #65fdff #ffffff".split(" ");
 c.colors = function () {
@@ -1775,7 +1774,6 @@ var F = ~navigator.userAgent.indexOf("Mac"),
     L = this.setTimeout;
 c.EventEmitter = EventEmitter;
 c.isMac = F;
-c.inherits = u;
 c.on = on;
 c.off = off;
 c.cancel = cancel;

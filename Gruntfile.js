@@ -19,6 +19,7 @@ module.exports = function (grunt) {
             build: {
                 src: [
                     'src/event.js',
+                    'src/utils.js',
                     'src/index.js'
                 ],
                 dest: 'public/terminal.js',
