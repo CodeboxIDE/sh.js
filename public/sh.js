@@ -126,8 +126,28 @@ var v = window,
 console.log(z);
 
 utils.inherits(Terminal, events.EventEmitter);
-Terminal.colors =
-    "#000000 #c81908 #00c01d #c8c221 #0033c5 #c73ac5 #00c6c7 #c7c7c7 #686868 #8a8a8a #67f86e #fff970 #6678fc #ff7cfd #65fdff #ffffff".split(" ");
+
+
+Terminal.colors = [
+    "#000000",
+    "#c81908",
+    "#00c01d",
+    "#c8c221",
+    "#0033c5",
+    "#c73ac5",
+    "#00c6c7",
+    "#c7c7c7",
+    "#686868",
+    "#8a8a8a",
+    "#67f86e",
+    "#fff970",
+    "#6678fc",
+    "#ff7cfd",
+    "#65fdff",
+    "#ffffff"
+];
+
+
 Terminal.colors = function () {
     function a(a, c, f) {
         y.push("#" + k(a) + k(c) + k(f))
@@ -144,10 +164,12 @@ Terminal.colors = function () {
     for (v = 0; 24 > v; v++) f = 8 + 10 * v, a(f, f, f);
     return y
 }();
+
 Terminal.defaultColors = {
     bg: "#000000",
     fg: "#f0f0f0"
 };
+
 Terminal.colors[256] = Terminal.defaultColors.bg;
 Terminal.colors[257] = Terminal.defaultColors.fg;
 Terminal.termName = "xterm";
@@ -159,19 +181,23 @@ Terminal.screenKeys = !1;
 Terminal.programFeatures = !1;
 Terminal.debug = !1;
 Terminal.focus = null;
+
 Terminal.prototype.focus = function () {
     this.selectionMode = !1;
     this.inputElement.focus();
     Terminal.focus !== this && (Terminal.focus && (Terminal.focus.cursorState = 0, Terminal.focus.refresh(Terminal.focus.y, Terminal.focus.y), Terminal.focus.sendFocus && Terminal.focus.send("\u001b[O")), Terminal.focus = this, this.sendFocus && this.send("\u001b[I"), this.showCursor())
 };
+
 Terminal.prototype.toggleVirtualCtrlKey = function () {
     this.virtualCtrlKey = !this.virtualCtrlKey;
     this.ctrlKeyElement.className = this.virtualCtrlKey ? "active" : ""
 };
+
 Terminal.prototype.toggleVirtualAltKey = function () {
     this.virtualAltKey = !this.virtualAltKey;
     this.altKeyElement.className = this.virtualAltKey ? "active" : ""
 };
+
 Terminal.prototype.applyVirtualKey = function (a) {
     if (!this.virtualCtrlKey && !this.virtualAltKey) return a;
     var c = {
@@ -196,6 +222,7 @@ Terminal.prototype.applyVirtualKey = function (a) {
     this.virtualAltKey && (Terminal.altKey = !0, this.toggleVirtualAltKey());
     return c
 };
+
 Terminal.prototype.bindKeys = function () {
     if (!Terminal.focus) {
         var a = this;
@@ -255,8 +282,8 @@ Terminal.prototype.bindKeys = function () {
         })
     }
 };
-Terminal.prototype.open =
-    function () {
+
+Terminal.prototype.open = function () {
         var a = this,
             E = 0,
             y;
@@ -330,6 +357,7 @@ Terminal.prototype.open =
         this.element.style.backgroundColor = Terminal.defaultColors.bg;
         this.element.style.color = Terminal.defaultColors.fg
 };
+
 Terminal.prototype.sizeToFit = function () {
     var a = z.createElement("div");
     a.className = "terminal";
@@ -352,6 +380,7 @@ Terminal.prototype.sizeToFit = function () {
     a.parentNode.removeChild(a);
     this.resize(v, k)
 };
+
 Terminal.prototype.bindMouse = function () {
     function a(a) {
         var c, k, p, y;
@@ -484,12 +513,14 @@ Terminal.prototype.bindMouse = function () {
         if (!s.mouseEvents && !s.applicationKeypad) return "DOMMouseScroll" === a.type ? s.scrollDisp(0 > a.detail ? -5 : 5) : s.scrollDisp(0 < a.wheelDeltaY ? -5 : 5), events.cancel(a)
     })
 };
+
 Terminal.prototype.destroy = function () {
     this.writable = this.readable = !1;
     this._events = {};
     this.handler = function () {};
     this.write = function () {}
 };
+
 Terminal.prototype.refresh = function (a, k) {
     var y, f, v, z, s, u, p, q, t, x, F, A, H, L = Terminal.focus === this;
     k - a >= this.rows / 2 && (H = this.element.parentNode) && H.removeChild(this.element);
@@ -527,13 +558,16 @@ Terminal.prototype.refresh = function (a, k) {
     }
     H && H.appendChild(this.element)
 };
+
 Terminal.prototype.redrawCursor = function () {
     this.refresh(this.y, this.y)
 };
+
 Terminal.prototype.showCursor = function () {
     this.cursorState || (this.cursorState = 1);
     this.redrawCursor()
 };
+
 Terminal.prototype.scroll = function () {
     var a;
     ++this.ybase === Terminal.scrollback &&
@@ -546,12 +580,14 @@ Terminal.prototype.scroll = function () {
     this.updateRange(this.scrollTop);
     this.updateRange(this.scrollBottom)
 };
+
 Terminal.prototype.scrollDisp = function (a) {
     this.ydisp += a;
     this.ydisp >
         this.ybase ? this.ydisp = this.ybase : 0 > this.ydisp && (this.ydisp = 0);
     this.refresh(0, this.rows - 1)
 };
+
 Terminal.prototype.write = function (a) {
     var k = a.length,
         y = 0,
@@ -965,9 +1001,11 @@ Terminal.prototype.write = function (a) {
     this.updateRange(this.y);
     this.refresh(this.refreshStart, this.refreshEnd)
 };
+
 Terminal.prototype.writeln = function (a) {
     this.write(a + "\r\n")
 };
+
 Terminal.prototype.keyDown = function (a) {
     a = this.applyVirtualKey(a);
     var c = this,
@@ -1102,6 +1140,7 @@ Terminal.prototype.keyDown = function (a) {
     "" !== k && this.showBufferedText();
     return !0
 };
+
 Terminal.prototype.showBufferedText = function () {
     var a = this.inputElement;
     v.setTimeout(function () {
@@ -1109,6 +1148,7 @@ Terminal.prototype.showBufferedText = function () {
             (a.className += " visible")
     }, 0)
 };
+
 Terminal.prototype.commitInput = function (a, c) {
     var k = this.inputElement.value;
     0 < k.length && (a = k + a, this.inputElement.value = "", this.inputElement.className = this.inputElement.className.replace(" visible", ""));
@@ -1116,14 +1156,17 @@ Terminal.prototype.commitInput = function (a, c) {
     this.showCursor();
     this.handler(a)
 };
+
 Terminal.prototype.setgLevel = function (a) {
     this.glevel = a;
     this.charset = this.charsets[a]
 };
+
 Terminal.prototype.setgCharset = function (a, c) {
     this.charsets[a] = c;
     this.glevel === a && (this.charset = c)
 };
+
 Terminal.prototype.keyPress = function (a) {
     a = this.applyVirtualKey(a);
     var c;
@@ -1135,6 +1178,7 @@ Terminal.prototype.keyPress = function (a) {
     else return !1; if (c && !a.ctrlKey || c && a.altKey && a.ctrlKey || c && a.altKey || c && a.altGraphKey) c = String.fromCharCode(c), this.commitInput(c, a);
     return !1
 };
+
 Terminal.prototype.send = function (a) {
     var c = this;
     this.queue || setTimeout(function () {
@@ -1143,6 +1187,7 @@ Terminal.prototype.send = function (a) {
     }, 1);
     this.queue += a
 };
+
 Terminal.prototype.bell = function () {
     if (Terminal.visualBell) {
         var a = this;
@@ -1153,18 +1198,21 @@ Terminal.prototype.bell = function () {
         Terminal.popOnBell && this.focus()
     }
 };
+
 Terminal.prototype.log = function () {
     if (Terminal.debug && v.console && v.console.log) {
         var a = Array.prototype.slice.call(arguments);
         v.console.log.apply(v.console, a)
     }
 };
+
 Terminal.prototype.error = function () {
     if (Terminal.debug && v.console && v.console.error) {
         var a = Array.prototype.slice.call(arguments);
         v.console.error.apply(v.console, a)
     }
 };
+
 Terminal.prototype.resize = function (a, c) {
     var k, f, v;
     1 > a && (a = 1);
@@ -1196,6 +1244,7 @@ Terminal.prototype.resize = function (a, c) {
     this.showSize(a, c);
     this.emit("resize", a, c)
 };
+
 Terminal.prototype.showSize = function (a, c) {
     var k = this.sizeIndicatorElement;
     k.innerHTML = a + "x" + c;
@@ -1205,66 +1254,81 @@ Terminal.prototype.showSize = function (a, c) {
         k.style.display = "none"
     }, 2E3)
 };
+
 Terminal.prototype.updateRange =
     function (a) {
         a < this.refreshStart && (this.refreshStart = a);
         a > this.refreshEnd && (this.refreshEnd = a)
 };
+
 Terminal.prototype.maxRange = function () {
     this.refreshStart = 0;
     this.refreshEnd = this.rows - 1
 };
+
 Terminal.prototype.setupStops = function (a) {
     null != a ? this.tabs[a] || (a = this.prevStop(a)) : (this.tabs = {}, a = 0);
     for (; a < this.cols; a += 8) this.tabs[a] = !0
 };
+
 Terminal.prototype.prevStop = function (a) {
     null == a && (a = this.x);
     for (; !this.tabs[--a] && 0 < a;);
     return a >= this.cols ? this.cols - 1 : 0 > a ? 0 : a
 };
+
 Terminal.prototype.nextStop = function (a) {
     null == a && (a = this.x);
     for (; !this.tabs[++a] &&
         a < this.cols;);
     return a >= this.cols ? this.cols - 1 : 0 > a ? 0 : a
 };
+
 Terminal.prototype.eraseRight = function (a, c) {
     for (var k = this.lines[this.ybase + c], f = [this.curAttr, " "]; a < this.cols; a++) k[a] = f;
     this.updateRange(c)
 };
+
 Terminal.prototype.eraseLeft = function (a, c) {
     var k = this.lines[this.ybase + c],
         f = [this.curAttr, " "];
     for (a++; a--;) k[a] = f;
     this.updateRange(c)
 };
+
 Terminal.prototype.eraseLine = function (a) {
     this.eraseRight(0, a)
 };
+
 Terminal.prototype.blankLine = function (a) {
     a = [a ? this.curAttr : this.defAttr, " "];
     for (var c = [], k = 0; k < this.cols; k++) c[k] = a;
     return c
 };
+
 Terminal.prototype.ch =
     function (a) {
         return a ? [this.curAttr, " "] : [this.defAttr, " "]
 };
+
 Terminal.prototype.is = function (a) {
     return 0 === ((this.termName || Terminal.termName) + "").indexOf(a)
 };
+
 Terminal.prototype.handler = function (a) {
     this.emit("data", a)
 };
+
 Terminal.prototype.handleTitle = function (a) {
     this.emit("title", a)
 };
+
 Terminal.prototype.index = function () {
     this.y++;
     this.y > this.scrollBottom && (this.y--, this.scroll());
     this.state = 0
 };
+
 Terminal.prototype.reverseIndex = function () {
     var a;
     this.y--;
@@ -1272,20 +1336,24 @@ Terminal.prototype.reverseIndex = function () {
         this.rows - 1 - this.scrollBottom, this.lines.splice(this.rows - 1 + this.ybase - a + 1, 1), this.updateRange(this.scrollTop), this.updateRange(this.scrollBottom));
     this.state = 0
 };
+
 Terminal.prototype.reset = function () {
     Terminal.call(this, this.cols, this.rows);
     this.refresh(0, this.rows - 1)
 };
+
 Terminal.prototype.tabSet = function () {
     this.tabs[this.x] = !0;
     this.state = 0
 };
+
 Terminal.prototype.cursorUp = function (a) {
     a = a[0];
     1 > a && (a = 1);
     this.y -= a;
     0 > this.y && (this.y = 0)
 };
+
 Terminal.prototype.cursorDown = function (a) {
     a = a[0];
     1 > a && (a = 1);
@@ -1293,18 +1361,21 @@ Terminal.prototype.cursorDown = function (a) {
     this.y >= this.rows && (this.y = this.rows -
         1)
 };
+
 Terminal.prototype.cursorForward = function (a) {
     a = a[0];
     1 > a && (a = 1);
     this.x += a;
     this.x >= this.cols && (this.x = this.cols - 1)
 };
+
 Terminal.prototype.cursorBackward = function (a) {
     a = a[0];
     1 > a && (a = 1);
     this.x -= a;
     0 > this.x && (this.x = 0)
 };
+
 Terminal.prototype.cursorPos = function (a) {
     var c;
     c = a[0] - 1;
@@ -1314,6 +1385,7 @@ Terminal.prototype.cursorPos = function (a) {
     this.x = a;
     this.y = c
 };
+
 Terminal.prototype.eraseInDisplay = function (a) {
     switch (a[0]) {
     case 0:
@@ -1328,6 +1400,7 @@ Terminal.prototype.eraseInDisplay = function (a) {
         for (a = this.rows; a--;) this.eraseLine(a)
     }
 };
+
 Terminal.prototype.eraseInLine = function (a) {
     switch (a[0]) {
     case 0:
@@ -1340,6 +1413,7 @@ Terminal.prototype.eraseInLine = function (a) {
         this.eraseLine(this.y)
     }
 };
+
 Terminal.prototype.charAttributes = function (a) {
     for (var c = a.length, k = 0, f, v; k < c; k++)
         if (f = a[k], 30 <= f && 37 >= f) this.curAttr = this.curAttr & -261633 | f - 30 << 9;
@@ -1364,6 +1438,7 @@ Terminal.prototype.charAttributes = function (a) {
     } else 22 === f ? this.curAttr &= -262145 :
         24 === f ? this.curAttr &= -524289 : 39 === f ? (this.curAttr &= -261633, this.curAttr |= (this.defAttr >> 9 & 511) << 9) : 49 === f ? (this.curAttr &= -512, this.curAttr |= this.defAttr & 511) : 38 === f ? 5 === a[k + 1] && (k += 2, f = a[k] & 255, this.curAttr = this.curAttr & -261633 | f << 9) : 48 === f && 5 === a[k + 1] && (k += 2, f = a[k] & 255, this.curAttr = this.curAttr & -512 | f)
 };
+
 Terminal.prototype.deviceStatus = function (a) {
     if (this.prefix) {
         if ("?" === this.prefix) switch (a[0]) {
@@ -1378,6 +1453,7 @@ Terminal.prototype.deviceStatus = function (a) {
         this.send("\u001b[" + (this.y + 1) + ";" + (this.x + 1) + "R")
     }
 };
+
 Terminal.prototype.insertChars = function (a) {
     var c, k, f;
     a = a[0];
@@ -1386,6 +1462,7 @@ Terminal.prototype.insertChars = function (a) {
     k = this.x;
     for (f = [this.curAttr, " "]; a-- && k < this.cols;) this.lines[c].splice(k++, 0, f), this.lines[c].pop()
 };
+
 Terminal.prototype.cursorNextLine = function (a) {
     a = a[0];
     1 > a && (a = 1);
@@ -1393,6 +1470,7 @@ Terminal.prototype.cursorNextLine = function (a) {
     this.y >= this.rows && (this.y = this.rows - 1);
     this.x = 0
 };
+
 Terminal.prototype.cursorPrecedingLine = function (a) {
     a = a[0];
     1 > a && (a = 1);
@@ -1400,12 +1478,14 @@ Terminal.prototype.cursorPrecedingLine = function (a) {
     0 > this.y && (this.y = 0);
     this.x = 0
 };
+
 Terminal.prototype.cursorCharAbsolute =
     function (a) {
         a = a[0];
         1 > a && (a = 1);
         this.x = a - 1
 };
+
 Terminal.prototype.insertLines = function (a) {
     var c, k;
     a = a[0];
@@ -1416,6 +1496,7 @@ Terminal.prototype.insertLines = function (a) {
     this.updateRange(this.y);
     this.updateRange(this.scrollBottom)
 };
+
 Terminal.prototype.deleteLines = function (a) {
     var c, k;
     a = a[0];
@@ -1427,6 +1508,7 @@ Terminal.prototype.deleteLines = function (a) {
     this.updateRange(this.y);
     this.updateRange(this.scrollBottom)
 };
+
 Terminal.prototype.deleteChars = function (a) {
     var c, k;
     a = a[0];
@@ -1434,6 +1516,7 @@ Terminal.prototype.deleteChars = function (a) {
     c = this.y + this.ybase;
     for (k = [this.curAttr, " "]; a--;) this.lines[c].splice(this.x, 1), this.lines[c].push(k)
 };
+
 Terminal.prototype.eraseChars = function (a) {
     var c, k, f;
     a = a[0];
@@ -1442,6 +1525,7 @@ Terminal.prototype.eraseChars = function (a) {
     k = this.x;
     for (f = [this.curAttr, " "]; a-- && k < this.cols;) this.lines[c][k++] = f
 };
+
 Terminal.prototype.charPosAbsolute = function (a) {
     a = a[0];
     1 > a && (a = 1);
@@ -1449,28 +1533,33 @@ Terminal.prototype.charPosAbsolute = function (a) {
     this.x >= this.cols && (this.x =
         this.cols - 1)
 };
+
 Terminal.prototype.HPositionRelative = function (a) {
     a = a[0];
     1 > a && (a = 1);
     this.x += a;
     this.x >= this.cols && (this.x = this.cols - 1)
 };
+
 Terminal.prototype.sendDeviceAttributes = function (a) {
     0 < a[0] || (this.prefix ? ">" === this.prefix && (this.is("xterm") ? this.send("\u001b[>0;276;0c") : this.is("rxvt-unicode") ? this.send("\u001b[>85;95;0c") : this.is("linux") ? this.send(a[0] + "c") : this.is("screen") && this.send("\u001b[>83;40003;0c")) : this.is("xterm") || this.is("rxvt-unicode") || this.is("screen") ? this.send("\u001b[?1;2c") : this.is("linux") &&
         this.send("\u001b[?6c"))
 };
+
 Terminal.prototype.linePosAbsolute = function (a) {
     a = a[0];
     1 > a && (a = 1);
     this.y = a - 1;
     this.y >= this.rows && (this.y = this.rows - 1)
 };
+
 Terminal.prototype.VPositionRelative = function (a) {
     a = a[0];
     1 > a && (a = 1);
     this.y += a;
     this.y >= this.rows && (this.y = this.rows - 1)
 };
+
 Terminal.prototype.HVPosition = function (a) {
     1 > a[0] && (a[0] = 1);
     1 > a[1] && (a[1] = 1);
@@ -1479,6 +1568,7 @@ Terminal.prototype.HVPosition = function (a) {
     this.x = a[1] - 1;
     this.x >= this.cols && (this.x = this.cols - 1)
 };
+
 Terminal.prototype.setMode = function (a) {
     if ("object" === typeof a)
         for (var k = a.length, v =
@@ -1550,6 +1640,7 @@ Terminal.prototype.setMode = function (a) {
         this.insertMode = !0
     }
 };
+
 Terminal.prototype.resetMode = function (a) {
     if ("object" === typeof a)
         for (var c = a.length, k = 0; k < c; k++) this.resetMode(a[k]);
@@ -1602,49 +1693,61 @@ Terminal.prototype.resetMode = function (a) {
         this.insertMode = !1
     }
 };
+
 Terminal.prototype.setScrollRegion = function (a) {
     this.prefix || (this.scrollTop = (a[0] || 1) - 1, this.scrollBottom = (a[1] || this.rows) - 1, this.y = this.x = 0)
 };
+
 Terminal.prototype.saveCursor = function (a) {
     this.savedX = this.x;
     this.savedY = this.y
 };
+
 Terminal.prototype.restoreCursor = function (a) {
     this.x = this.savedX || 0;
     this.y = this.savedY || 0
 };
+
 Terminal.prototype.cursorForwardTab = function (a) {
     for (a = a[0] || 1; a--;) this.x = this.nextStop()
 };
+
 Terminal.prototype.scrollUp = function (a) {
     for (a = a[0] || 1; a--;) this.lines.splice(this.ybase +
         this.scrollTop, 1), this.lines.splice(this.ybase + this.scrollBottom, 0, this.blankLine());
     this.updateRange(this.scrollTop);
     this.updateRange(this.scrollBottom)
 };
+
 Terminal.prototype.scrollDown = function (a) {
     for (a = a[0] || 1; a--;) this.lines.splice(this.ybase + this.scrollBottom, 1), this.lines.splice(this.ybase + this.scrollTop, 0, this.blankLine());
     this.updateRange(this.scrollTop);
     this.updateRange(this.scrollBottom)
 };
+
 Terminal.prototype.initMouseTracking = function (a) {};
 Terminal.prototype.resetTitleModes = function (a) {};
+
 Terminal.prototype.cursorBackwardTab =
     function (a) {
         for (a = a[0] || 1; a--;) this.x = this.prevStop()
 };
+
 Terminal.prototype.repeatPrecedingCharacter = function (a) {
     a = a[0] || 1;
     for (var c = this.lines[this.ybase + this.y], k = c[this.x - 1] || [this.defAttr, " "]; a--;) c[this.x++] = k
 };
+
 Terminal.prototype.tabClear = function (a) {
     a = a[0];
     0 >= a ? delete this.tabs[this.x] : 3 === a && (this.tabs = {})
 };
+
 Terminal.prototype.mediaCopy = function (a) {};
 Terminal.prototype.setResources = function (a) {};
 Terminal.prototype.disableModifiers = function (a) {};
 Terminal.prototype.setPointerMode = function (a) {};
+
 Terminal.prototype.softReset = function (a) {
     this.applicationCursor =
         this.applicationKeypad = this.wraparoundMode = this.originMode = this.insertMode = this.cursorHidden = !1;
@@ -1656,14 +1759,15 @@ Terminal.prototype.softReset = function (a) {
     this.glevel = 0;
     this.charsets = [null]
 };
+
 Terminal.prototype.requestAnsiMode = function (a) {};
 Terminal.prototype.requestPrivateMode = function (a) {};
 Terminal.prototype.setConformanceLevel = function (a) {};
 Terminal.prototype.loadLEDs = function (a) {};
 Terminal.prototype.setCursorStyle = function (a) {};
 Terminal.prototype.setCharProtectionAttr = function (a) {};
-Terminal.prototype.restorePrivateValues =
-    function (a) {};
+Terminal.prototype.restorePrivateValues = function (a) {};
+
 Terminal.prototype.setAttrInRectangle = function (a) {
     for (var c = a[0], k = a[1], f = a[2], v = a[3], s = a[4], z, u; c < f + 1; c++) {
         z = this.lines[this.ybase + c];
@@ -1672,17 +1776,18 @@ Terminal.prototype.setAttrInRectangle = function (a) {
     this.updateRange(a[0]);
     this.updateRange(a[2])
 };
+
 Terminal.prototype.savePrivateValues = function (a) {};
 Terminal.prototype.manipulateWindow = function (a) {};
 Terminal.prototype.reverseAttrInRectangle = function (a) {};
 Terminal.prototype.setTitleModeFeature = function (a) {};
 Terminal.prototype.setWarningBellVolume = function (a) {};
 Terminal.prototype.setMarginBellVolume = function (a) {};
-Terminal.prototype.copyRectangle =
-    function (a) {};
+Terminal.prototype.copyRectangle = function (a) {};
 Terminal.prototype.enableFilterRectangle = function (a) {};
 Terminal.prototype.requestParameters = function (a) {};
 Terminal.prototype.selectChangeExtent = function (a) {};
+
 Terminal.prototype.fillRectangle = function (a) {
     for (var c = a[0], k = a[1], f = a[2], v = a[3], s = a[4], z, u; k < v + 1; k++) {
         z = this.lines[this.ybase + k];
@@ -1691,6 +1796,7 @@ Terminal.prototype.fillRectangle = function (a) {
     this.updateRange(a[1]);
     this.updateRange(a[3])
 };
+
 Terminal.prototype.enableLocatorReporting = function (a) {};
 Terminal.prototype.eraseRectangle = function (a) {
     var c = a[0],
@@ -1705,20 +1811,24 @@ Terminal.prototype.eraseRectangle = function (a) {
     this.updateRange(a[0]);
     this.updateRange(a[2])
 };
+
 Terminal.prototype.setLocatorEvents = function (a) {};
 Terminal.prototype.selectiveEraseRectangle = function (a) {};
 Terminal.prototype.requestLocatorPosition = function (a) {};
+
 Terminal.prototype.insertColumns = function () {
     for (var a = params[0], c = this.ybase + this.rows, k = [this.curAttr, " "], f; a--;)
         for (f = this.ybase; f < c; f++) this.lines[f].splice(this.x + 1, 0, k), this.lines[f].pop();
     this.maxRange()
 };
+
 Terminal.prototype.deleteColumns = function () {
     for (var a =
         params[0], c = this.ybase + this.rows, k = [this.curAttr, " "], f; a--;)
         for (f = this.ybase; f < c; f++) this.lines[f].splice(this.x, 1), this.lines[f].push(k);
     this.maxRange()
 };
+
 Terminal.charsets = {};
 Terminal.charsets.SCLD = {
     "`": "\u25c6",
