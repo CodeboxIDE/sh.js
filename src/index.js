@@ -47,22 +47,6 @@ function c(a, k, y) {
     this.setupStops()
 }
 
-function k(a, c, k, f) {
-    a.addEventListener(c, k, f || !1)
-}
-
-function x(a, c, k, f) {
-    a.removeEventListener(c, k, f || !1)
-}
-
-function t(a) {
-    a.preventDefault && a.preventDefault();
-    a.returnValue = !1;
-    a.stopPropagation && a.stopPropagation();
-    a.cancelBubble = !0;
-    return !1
-}
-
 function u(a, c) {
     function k() {
         this.constructor = a
@@ -160,59 +144,59 @@ c.prototype.applyVirtualKey = function (a) {
 c.prototype.bindKeys = function () {
     if (!c.focus) {
         var a = this;
-        k(this.tabKeyElement, "touchend", function (c) {
+        on(this.tabKeyElement, "touchend", function (c) {
             a.keyDown({
                 keyCode: 9
             })
         }, !0);
-        k(this.ctrlKeyElement, "touchend", function (c) {
+        on(this.ctrlKeyElement, "touchend", function (c) {
             a.toggleVirtualCtrlKey()
         }, !0);
-        k(this.altKeyElement, "touchend", function (c) {
+        on(this.altKeyElement, "touchend", function (c) {
             a.toggleVirtualAltKey()
         }, !0);
-        k(this.escKeyElement,
+        on(this.escKeyElement,
             "touchend", function (c) {
                 a.keyDown({
                     keyCode: 27
                 })
             }, !0);
-        k(this.leftKeyElement, "touchend", function (c) {
+        on(this.leftKeyElement, "touchend", function (c) {
             a.keyDown({
                 keyCode: 37
             })
         }, !0);
-        k(this.downKeyElement, "touchend", function (c) {
+        on(this.downKeyElement, "touchend", function (c) {
             a.keyDown({
                 keyCode: 40
             })
         }, !0);
-        k(this.upKeyElement, "touchend", function (c) {
+        on(this.upKeyElement, "touchend", function (c) {
             a.keyDown({
                 keyCode: 38
             })
         }, !0);
-        k(this.rightKeyElement, "touchend", function (c) {
+        on(this.rightKeyElement, "touchend", function (c) {
             a.keyDown({
                 keyCode: 39
             })
         }, !0);
         for (var v = 0, y = [this.tabKeyElement, this.ctrlKeyElement, this.altKeyElement, this.escKeyElement, this.leftKeyElement, this.downKeyElement, this.upKeyElement, this.rightKeyElement,
                 this.screenKeysElement
-            ]; v < y.length; v++) k(y[v], "touchend", function (c) {
+            ]; v < y.length; v++) on(y[v], "touchend", function (c) {
             a.focus();
-            t(c)
+            cancel(c)
         });
-        k(this.inputElement, "keydown", function (c) {
+        on(this.inputElement, "keydown", function (c) {
             return a.keyDown(c)
         }, !0);
-        k(this.inputElement, "keypress", function (c) {
+        on(this.inputElement, "keypress", function (c) {
             return a.keyPress(c)
         }, !0);
-        k(z, "keydown", function (c) {
+        on(z, "keydown", function (c) {
             var k = (F && c.metaKey || !F && c.ctrlKey) && 67 === c.keyCode;
             a.selectionMode && (!k && 48 <= c.keyCode && 222 >= c.keyCode && -1 === [91, 92, 93, 144, 145].indexOf(c.keyCode)) && a.inputElement.focus();
-            !F && (k && c.shiftKey && z.execCommand) && (z.execCommand("copy", !0, null), t(c))
+            !F && (k && c.shiftKey && z.execCommand) && (z.execCommand("copy", !0, null), cancel(c))
         })
     }
 };
@@ -273,7 +257,7 @@ c.prototype.open =
         this.refresh(0, this.rows - 1);
         this.bindKeys();
         this.focus();
-        k(this.element, "mousedown", function (c) {
+        on(this.element, "mousedown", function (c) {
             c = null != c.button ? +c.button : null != c.which ? c.which - 1 : null;~
             navigator.userAgent.indexOf("MSIE") &&
                 (c = 1 === c ? 0 : 4 === c ? 1 : c);
@@ -281,7 +265,7 @@ c.prototype.open =
                 a.element.contentEditable = "inherit"
             }, 1))
         }, !0);
-        k(this.inputElement, "paste", function (c) {
+        on(this.inputElement, "paste", function (c) {
             v.setTimeout(function () {
                 a.commitInput("", c)
             }, 20)
@@ -402,47 +386,47 @@ c.prototype.bindMouse = function () {
         s = this,
         F = 32,
         p = "onmousewheel" in v ? "mousewheel" : "DOMMouseScroll";
-    k(q, "mousedown", function (f) {
+    on(q, "mousedown", function (f) {
         if (s.mouseEvents) {
             a(f);
             s.selectionMode || s.focus();
             if (s.vt200Mouse) return a({
                 __proto__: f,
                 type: "mouseup"
-            }), t(f);
-            s.normalMouse && k(z, "mousemove", c);
+            }), cancel(f);
+            s.normalMouse && on(z, "mousemove", c);
             if (!s.x10Mouse) {
                 var p = function (f) {
                     a(f);
-                    x(z, "mousemove", c);
-                    x(z, "mouseup", p);
-                    x(z, "mousedown", p);
-                    return t(f)
+                    off(z, "mousemove", c);
+                    off(z, "mouseup", p);
+                    off(z, "mousedown", p);
+                    return cancel(f)
                 };
-                k(z, "mouseup", p);
-                k(z, "mousedown", p)
+                on(z, "mouseup", p);
+                on(z, "mousedown", p)
             }
-            return t(f)
+            return cancel(f)
         }
     });
-    k(q, "mouseup", function (a) {
+    on(q, "mouseup", function (a) {
         v.getSelection && 0 < v.getSelection().toString().length && (s.selectionMode = !0);
         v.setTimeout(function () {
             v.getSelection && 0 === v.getSelection().toString().length && (s.selectionMode = !1)
         }, 0)
     });
-    k(q, "touchend", function (a) {
+    on(q, "touchend", function (a) {
         s.selectionMode || s.focus();
         a.stopPropagation()
     });
-    k(q, "click", function (a) {
+    on(q, "click", function (a) {
         s.selectionMode || s.focus()
     });
-    k(q, p, function (c) {
-        if (s.mouseEvents && !s.x10Mouse && !s.vt300Mouse && !s.decLocator) return a(c), t(c)
+    on(q, p, function (c) {
+        if (s.mouseEvents && !s.x10Mouse && !s.vt300Mouse && !s.decLocator) return a(c), cancel(c)
     });
-    k(q, p, function (a) {
-        if (!s.mouseEvents && !s.applicationKeypad) return "DOMMouseScroll" === a.type ? s.scrollDisp(0 > a.detail ? -5 : 5) : s.scrollDisp(0 < a.wheelDeltaY ? -5 : 5), t(a)
+    on(q, p, function (a) {
+        if (!s.mouseEvents && !s.applicationKeypad) return "DOMMouseScroll" === a.type ? s.scrollDisp(0 > a.detail ? -5 : 5) : s.scrollDisp(0 < a.wheelDeltaY ? -5 : 5), cancel(a)
     })
 };
 c.prototype.destroy = function () {
@@ -1007,11 +991,11 @@ c.prototype.keyDown = function (a) {
         k = "\u001bOF";
         break;
     case 33:
-        if (a.shiftKey) return this.scrollDisp(-(this.rows - 1)), t(a);
+        if (a.shiftKey) return this.scrollDisp(-(this.rows - 1)), cancel(a);
         k = "\u001b[5~";
         break;
     case 34:
-        if (a.shiftKey) return this.scrollDisp(this.rows - 1), t(a);
+        if (a.shiftKey) return this.scrollDisp(this.rows - 1), cancel(a);
         k = "\u001b[6~";
         break;
     case 112:
@@ -1059,7 +1043,7 @@ c.prototype.keyDown = function (a) {
         }, 20);
         else if (!a.ctrlKey && (!F && a.altKey || F && a.metaKey)) 65 <= a.keyCode && 90 >= a.keyCode ? k = "\u001b" + H.fromCharCode(a.keyCode + 32) : 192 === a.keyCode ? k = "\u001b`" : 48 <= a.keyCode && 57 >= a.keyCode && (k = "\u001b" + (a.keyCode - 48))
     }
-    if (k) return this.commitInput(k, a), t(a);
+    if (k) return this.commitInput(k, a), cancel(a);
     "" !== k && this.showBufferedText();
     return !0
 };
@@ -1089,7 +1073,7 @@ c.prototype.keyPress = function (a) {
     a = this.applyVirtualKey(a);
     var c;
     if (a.metaKey && 118 === a.charCode) return !1;
-    t(a);
+    cancel(a);
     if (a.charCode) c = a.charCode;
     else if (null == a.which) c = a.keyCode;
     else if (0 !== a.which && 0 !== a.charCode) c = a.which;
@@ -1733,9 +1717,9 @@ var F = ~navigator.userAgent.indexOf("Mac"),
 c.EventEmitter = EventEmitter;
 c.isMac = F;
 c.inherits = u;
-c.on = k;
-c.off = x;
-c.cancel = t;
+c.on = on;
+c.off = off;
+c.cancel = cancel;
 
 exports.Terminal = c;
 

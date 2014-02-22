@@ -42,3 +42,19 @@ EventEmitter.prototype.emit = function (a) {
 EventEmitter.prototype.listeners = function (a) {
     return this._events[a] = this._events[a] || []
 };
+
+function on(a, c, k, f) {
+    a.addEventListener(c, k, f || !1)
+}
+
+function off(a, c, k, f) {
+    a.removeEventListener(c, k, f || !1)
+}
+
+function cancel(a) {
+    a.preventDefault && a.preventDefault();
+    a.returnValue = !1;
+    a.stopPropagation && a.stopPropagation();
+    a.cancelBubble = !0;
+    return !1
+}
