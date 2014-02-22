@@ -187,9 +187,9 @@ c.prototype.bindKeys = function () {
             return a.keyPress(c)
         }, !0);
         on(z, "keydown", function (c) {
-            var k = (F && c.metaKey || !F && c.ctrlKey) && 67 === c.keyCode;
+            var k = (isMac && c.metaKey || !isMac && c.ctrlKey) && 67 === c.keyCode;
             a.selectionMode && (!k && 48 <= c.keyCode && 222 >= c.keyCode && -1 === [91, 92, 93, 144, 145].indexOf(c.keyCode)) && a.inputElement.focus();
-            !F && (k && c.shiftKey && z.execCommand) && (z.execCommand("copy", !0, null), cancel(c))
+            !isMac && (k && c.shiftKey && z.execCommand) && (z.execCommand("copy", !0, null), cancel(c))
         })
     }
 };
@@ -1028,13 +1028,13 @@ c.prototype.keyDown = function (a) {
         k = "\u001b[24~";
         break;
     default:
-        if (a.ctrlKey && !a.altKey)!F && a.shiftKey && 86 === a.keyCode ? (k = "", v.setTimeout(function () {
+        if (a.ctrlKey && !a.altKey)!isMac && a.shiftKey && 86 === a.keyCode ? (k = "", v.setTimeout(function () {
             c.commitInput("", a)
         }, 20)) : 65 <= a.keyCode && 90 >= a.keyCode ? k = H.fromCharCode(a.keyCode - 64) : 32 === a.keyCode ? k = H.fromCharCode(0) : 51 <= a.keyCode && 55 >= a.keyCode ? k = H.fromCharCode(a.keyCode - 51 + 27) : 56 === a.keyCode ? k = H.fromCharCode(127) : 219 === a.keyCode ? k = H.fromCharCode(27) : 221 === a.keyCode && (k = H.fromCharCode(29));
-        else if (F && a.metaKey && 86 === a.keyCode) k = "", v.setTimeout(function () {
+        else if (isMac && a.metaKey && 86 === a.keyCode) k = "", v.setTimeout(function () {
             c.commitInput("", a)
         }, 20);
-        else if (!a.ctrlKey && (!F && a.altKey || F && a.metaKey)) 65 <= a.keyCode && 90 >= a.keyCode ? k = "\u001b" + H.fromCharCode(a.keyCode + 32) : 192 === a.keyCode ? k = "\u001b`" : 48 <= a.keyCode && 57 >= a.keyCode && (k = "\u001b" + (a.keyCode - 48))
+        else if (!a.ctrlKey && (!isMac && a.altKey || isMac && a.metaKey)) 65 <= a.keyCode && 90 >= a.keyCode ? k = "\u001b" + H.fromCharCode(a.keyCode + 32) : 192 === a.keyCode ? k = "\u001b`" : 48 <= a.keyCode && 57 >= a.keyCode && (k = "\u001b" + (a.keyCode - 48))
     }
     if (k) return this.commitInput(k, a), cancel(a);
     "" !== k && this.showBufferedText();
@@ -1704,11 +1704,11 @@ c.charsets.Spanish = null;
 c.charsets.Swedish = null;
 c.charsets.Swiss = null;
 c.charsets.ISOLatin = null;
-var F = ~navigator.userAgent.indexOf("Mac"),
+var isMac = ~navigator.userAgent.indexOf("Mac"),
     H = this.String,
     L = this.setTimeout;
 c.EventEmitter = EventEmitter;
-c.isMac = F;
+c.isMac = isMac;
 c.on = on;
 c.off = off;
 c.cancel = cancel;
