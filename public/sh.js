@@ -1,4 +1,55 @@
 !function(e){if("object"==typeof exports)module.exports=e();else if("function"==typeof define&&define.amd)define(e);else{var f;"undefined"!=typeof window?f=window:"undefined"!=typeof global?f=global:"undefined"!=typeof self&&(f=self),f.Terminal=e()}}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);throw new Error("Cannot find module '"+o+"'")}var f=n[o]={exports:{}};t[o][0].call(f.exports,function(e){var n=t[o][1][e];return s(n?n:e)},f,f.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(_dereq_,module,exports){
+var charsets = {};
+
+charsets.SCLD = {
+    "`": "\u25c6",
+    a: "\u2592",
+    b: "\t",
+    c: "\f",
+    d: "\r",
+    e: "\n",
+    f: "\u00b0",
+    g: "\u00b1",
+    h: "\u2424",
+    i: "\x0B",
+    j: "\u2518",
+    k: "\u2510",
+    l: "\u250c",
+    m: "\u2514",
+    n: "\u253c",
+    o: "\u23ba",
+    p: "\u23bb",
+    q: "\u2500",
+    r: "\u23bc",
+    s: "\u23bd",
+    t: "\u251c",
+    u: "\u2524",
+    v: "\u2534",
+    w: "\u252c",
+    x: "\u2502",
+    y: "\u2264",
+    z: "\u2265",
+    "{": "\u03c0",
+    "|": "\u2260",
+    "}": "\u00a3",
+    "~": "\u00b7"
+};
+charsets.UK = null;
+charsets.US = null;
+charsets.Dutch = null;
+charsets.Finnish = null;
+charsets.French = null;
+charsets.FrenchCanadian = null;
+charsets.German = null;
+charsets.Italian = null;
+charsets.NorwegianDanish = null;
+charsets.Spanish = null;
+charsets.Swedish = null;
+charsets.Swiss = null;
+charsets.ISOLatin = null;
+
+module.exports = charsets;
+},{}],2:[function(_dereq_,module,exports){
 function EventEmitter() {
     this._events = this._events || {}
 }
@@ -66,10 +117,11 @@ module.exports= {
     'off': off,
     'cancel': cancel
 };
-},{}],2:[function(_dereq_,module,exports){
+},{}],3:[function(_dereq_,module,exports){
 var events = _dereq_("./events");
 var utils = _dereq_("./utils");
 var themes = _dereq_("./themes");
+var charsets = _dereq_("./charsets");
 
 function Terminal(a, k, y) {
     events.EventEmitter.call(this);
@@ -1881,53 +1933,7 @@ Terminal.prototype.deleteColumns = function () {
     this.maxRange()
 };
 
-Terminal.charsets = {};
-Terminal.charsets.SCLD = {
-    "`": "\u25c6",
-    a: "\u2592",
-    b: "\t",
-    c: "\f",
-    d: "\r",
-    e: "\n",
-    f: "\u00b0",
-    g: "\u00b1",
-    h: "\u2424",
-    i: "\x0B",
-    j: "\u2518",
-    k: "\u2510",
-    l: "\u250c",
-    m: "\u2514",
-    n: "\u253c",
-    o: "\u23ba",
-    p: "\u23bb",
-    q: "\u2500",
-    r: "\u23bc",
-    s: "\u23bd",
-    t: "\u251c",
-    u: "\u2524",
-    v: "\u2534",
-    w: "\u252c",
-    x: "\u2502",
-    y: "\u2264",
-    z: "\u2265",
-    "{": "\u03c0",
-    "|": "\u2260",
-    "}": "\u00a3",
-    "~": "\u00b7"
-};
-Terminal.charsets.UK = null;
-Terminal.charsets.US = null;
-Terminal.charsets.Dutch = null;
-Terminal.charsets.Finnish = null;
-Terminal.charsets.French = null;
-Terminal.charsets.FrenchCanadian = null;
-Terminal.charsets.German = null;
-Terminal.charsets.Italian = null;
-Terminal.charsets.NorwegianDanish = null;
-Terminal.charsets.Spanish = null;
-Terminal.charsets.Swedish = null;
-Terminal.charsets.Swiss = null;
-Terminal.charsets.ISOLatin = null;
+Terminal.charsets = charsets;
 
 Terminal.isMac = ~navigator.userAgent.indexOf("Mac");
 Terminal.isMSIE = ~navigator.userAgent.indexOf("MSIE");
@@ -1936,7 +1942,7 @@ Terminal.themes = themes;
 
 
 module.exports = Terminal;
-},{"./events":1,"./themes":3,"./utils":4}],3:[function(_dereq_,module,exports){
+},{"./charsets":1,"./events":2,"./themes":4,"./utils":5}],4:[function(_dereq_,module,exports){
 
 var initColors = function (colors) {
     function a(a, c, f) {
@@ -2632,7 +2638,7 @@ module.exports = {
     'defaults': defaults,
     'colors': colors
 }
-},{}],4:[function(_dereq_,module,exports){
+},{}],5:[function(_dereq_,module,exports){
 function inherits(a, c) {
     function k() {
         this.constructor = a
@@ -2657,6 +2663,6 @@ module.exports = {
     'inherits': inherits,
     'isBoldBroken': isBoldBroken
 };
-},{}]},{},[2])
-(2)
+},{}]},{},[3])
+(3)
 });
