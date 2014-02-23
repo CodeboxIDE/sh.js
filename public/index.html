@@ -28,7 +28,7 @@
             }
 
             var term = new Terminal({
-                theme: "default",
+                theme: "github",
                 cols: 80,
                 rows: 24
             });
@@ -82,6 +82,10 @@
             switchTab(name);
             term.sizeToFit();
             term.focus();
+
+            $(window).resize(function () {
+                term.sizeToFit();
+            });
         };
 
         // Open a terminal

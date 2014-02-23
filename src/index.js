@@ -3,25 +3,24 @@ var utils = require("./utils");
 var themes = require("./themes");
 var charsets = require("./charsets");
 
-function Terminal(a, k, y) {
+function Terminal(a, k) {
     events.EventEmitter.call(this);
 
     var f;
-    "object" === typeof a && (f = a, a = f.cols, k = f.rows, y = f.handler);
+    "object" === typeof a && (f = a, a = f.cols, k = f.rows);
 
     this._options = f || {};
 
     this.cols = a || Terminal.geometry[0];
     this.rows = k || Terminal.geometry[1];
 
-    if (y) this.on("data", y);
-
     // Theme
-    var theme = this._options.theme || "default";
-    if (typeof theme == 'string' || theme instanceof String) {
+    var theme = this._options.theme;
+    if ((typeof theme == 'string') || (theme instanceof String)) {
         theme = themes.defaults[theme];
     }
-    if (theme) this.colors = themes.colors(theme);
+    if (!theme) theme = themes.defaults["default"];
+    this.colors = themes.colors(theme);
 
     this.cursorState = this.y = this.x = this.ydisp = this.ybase = 0;
     this.convertEol = this.cursorHidden = !1;
@@ -281,23 +280,32 @@ Terminal.prototype.open = function (parent) {
 };
 
 Terminal.prototype.sizeToFit = function () {
+    if (!utils.isVisible(this.element)) return;
+
+    var maxW = 500;
+    var maxH = 500;
+
     var a = document.createElement("div");
     a.className = "terminal";
     a.style.width = "0";
     a.style.height = "0";
-    a.style.visibility =
-        "hidden";
+    a.style.visibility = "hidden";
+
     var c = document.createElement("div");
     c.style.position = "absolute";
     c.innerHTML = "W";
+
     a.appendChild(c);
     this.containerElement.insertBefore(a, this.element.nextSibling);
+
     var k = this.element.clientWidth,
         f = this.element.clientHeight,
         v;
-    for (v = 1; 2E3 > v && !(c.innerHTML += "W", c.offsetWidth > k); v++);
+    for (v = 1; maxW > v && !(c.innerHTML += "W", c.offsetWidth > k); v++);
+
     c.innerHTML = "W";
-    for (k = 1; 2E3 > k && !(c.innerHTML += "<br />W", c.offsetHeight > f); k++);
+    for (k = 1; maxH > k && !(c.innerHTML += "<br />W", c.offsetHeight > f); k++);
+
     c.parentNode.removeChild(c);
     a.parentNode.removeChild(a);
     this.resize(v, k)

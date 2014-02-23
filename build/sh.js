@@ -123,25 +123,24 @@ var utils = _dereq_("./utils");
 var themes = _dereq_("./themes");
 var charsets = _dereq_("./charsets");
 
-function Terminal(a, k, y) {
+function Terminal(a, k) {
     events.EventEmitter.call(this);
 
     var f;
-    "object" === typeof a && (f = a, a = f.cols, k = f.rows, y = f.handler);
+    "object" === typeof a && (f = a, a = f.cols, k = f.rows);
 
     this._options = f || {};
 
     this.cols = a || Terminal.geometry[0];
     this.rows = k || Terminal.geometry[1];
 
-    if (y) this.on("data", y);
-
     // Theme
-    var theme = this._options.theme || "default";
-    if (typeof theme == 'string' || theme instanceof String) {
+    var theme = this._options.theme;
+    if ((typeof theme == 'string') || (theme instanceof String)) {
         theme = themes.defaults[theme];
     }
-    if (theme) this.colors = themes.colors(theme);
+    if (!theme) theme = themes.defaults["default"];
+    this.colors = themes.colors(theme);
 
     this.cursorState = this.y = this.x = this.ydisp = this.ybase = 0;
     this.convertEol = this.cursorHidden = !1;
@@ -401,23 +400,32 @@ Terminal.prototype.open = function (parent) {
 };
 
 Terminal.prototype.sizeToFit = function () {
+    if (!utils.isVisible(this.element)) return;
+
+    var maxW = 500;
+    var maxH = 500;
+
     var a = document.createElement("div");
     a.className = "terminal";
     a.style.width = "0";
     a.style.height = "0";
-    a.style.visibility =
-        "hidden";
+    a.style.visibility = "hidden";
+
     var c = document.createElement("div");
     c.style.position = "absolute";
     c.innerHTML = "W";
+
     a.appendChild(c);
     this.containerElement.insertBefore(a, this.element.nextSibling);
+
     var k = this.element.clientWidth,
         f = this.element.clientHeight,
         v;
-    for (v = 1; 2E3 > v && !(c.innerHTML += "W", c.offsetWidth > k); v++);
+    for (v = 1; maxW > v && !(c.innerHTML += "W", c.offsetWidth > k); v++);
+
     c.innerHTML = "W";
-    for (k = 1; 2E3 > k && !(c.innerHTML += "<br />W", c.offsetHeight > f); k++);
+    for (k = 1; maxH > k && !(c.innerHTML += "<br />W", c.offsetHeight > f); k++);
+
     c.parentNode.removeChild(c);
     a.parentNode.removeChild(a);
     this.resize(v, k)
@@ -1964,7 +1972,7 @@ var initColors = function (colors) {
 // Return colors for a theme
 var colors = function(theme) {
     // Copy pallette
-    var colors = theme.palette;
+    var colors = theme.palette.slice(0);
 
     // Set background and forground colors if available
     colors[256] = theme.background || "#000000";
@@ -2647,6 +2655,30 @@ function inherits(a, c) {
     a.prototype = new k
 }
 
+function isVisible(el) {
+    var eap,
+        rect     = el.getBoundingClientRect(),
+        docEl    = document.documentElement,
+        vWidth   = window.innerWidth || docEl.clientWidth,
+        vHeight  = window.innerHeight || docEl.clientHeight,
+        efp      = function (x, y) { return document.elementFromPoint(x, y) },
+        contains = "contains" in el ? "contains" : "compareDocumentPosition",
+        has      = contains == "contains" ? 1 : 0x10;
+
+    // Return false if it's not in the viewport
+    if (rect.right < 0 || rect.bottom < 0 
+            || rect.left > vWidth || rect.top > vHeight)
+        return false;
+
+    // Return true if any of its four corners are visible
+    return (
+          (eap = efp(rect.left,  rect.top)) == el || el[contains](eap) == has
+      ||  (eap = efp(rect.right, rect.top)) == el || el[contains](eap) == has
+      ||  (eap = efp(rect.right, rect.bottom)) == el || el[contains](eap) == has
+      ||  (eap = efp(rect.left,  rect.bottom)) == el || el[contains](eap) == has
+    );
+}
+
 function isBoldBroken() {
     var a = document.createElement("span");
     a.innerHTML =
@@ -2661,7 +2693,8 @@ function isBoldBroken() {
 
 module.exports = {
     'inherits': inherits,
-    'isBoldBroken': isBoldBroken
+    'isBoldBroken': isBoldBroken,
+    'isVisible': isVisible
 };
 },{}]},{},[3])
 (3)

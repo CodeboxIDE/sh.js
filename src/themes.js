@@ -19,7 +19,7 @@ var initColors = function (colors) {
 // Return colors for a theme
 var colors = function(theme) {
     // Copy pallette
-    var colors = theme.palette;
+    var colors = theme.palette.slice(0);
 
     // Set background and forground colors if available
     colors[256] = theme.background || "#000000";
