@@ -220,60 +220,60 @@ Terminal.prototype.applyVirtualKey = function (a) {
 };
 
 Terminal.prototype.bindKeys = function () {
-    if (!Terminal.focus) {
-        var a = this;
+    if (Terminal.focus != this) {
+        var that = this;
         events.on(this.tabKeyElement, "touchend", function (c) {
-            a.keyDown({
+            that.keyDown({
                 keyCode: 9
             })
         }, !0);
         events.on(this.ctrlKeyElement, "touchend", function (c) {
-            a.toggleVirtualCtrlKey()
+            that.toggleVirtualCtrlKey()
         }, !0);
         events.on(this.altKeyElement, "touchend", function (c) {
-            a.toggleVirtualAltKey()
+            that.toggleVirtualAltKey()
         }, !0);
         events.on(this.escKeyElement,
             "touchend", function (c) {
-                a.keyDown({
+                that.keyDown({
                     keyCode: 27
                 })
             }, !0);
         events.on(this.leftKeyElement, "touchend", function (c) {
-            a.keyDown({
+            that.keyDown({
                 keyCode: 37
             })
         }, !0);
         events.on(this.downKeyElement, "touchend", function (c) {
-            a.keyDown({
+            that.keyDown({
                 keyCode: 40
             })
         }, !0);
         events.on(this.upKeyElement, "touchend", function (c) {
-            a.keyDown({
+            that.keyDown({
                 keyCode: 38
             })
         }, !0);
         events.on(this.rightKeyElement, "touchend", function (c) {
-            a.keyDown({
+            that.keyDown({
                 keyCode: 39
             })
         }, !0);
         for (var v = 0, y = [this.tabKeyElement, this.ctrlKeyElement, this.altKeyElement, this.escKeyElement, this.leftKeyElement, this.downKeyElement, this.upKeyElement, this.rightKeyElement,
                 this.screenKeysElement
             ]; v < y.length; v++) events.on(y[v], "touchend", function (c) {
-            a.focus();
+            that.focus();
             events.cancel(c)
         });
         events.on(this.inputElement, "keydown", function (c) {
-            return a.keyDown(c)
+            return that.keyDown(c)
         }, !0);
         events.on(this.inputElement, "keypress", function (c) {
-            return a.keyPress(c)
+            return that.keyPress(c)
         }, !0);
         events.on(document, "keydown", function (c) {
             var k = (isMac && c.metaKey || !isMac && c.ctrlKey) && 67 === c.keyCode;
-            a.selectionMode && (!k && 48 <= c.keyCode && 222 >= c.keyCode && -1 === [91, 92, 93, 144, 145].indexOf(c.keyCode)) && a.inputElement.focus();
+            that.selectionMode && (!k && 48 <= c.keyCode && 222 >= c.keyCode && -1 === [91, 92, 93, 144, 145].indexOf(c.keyCode)) && that.inputElement.focus();
             !isMac && (k && c.shiftKey && document.execCommand) && (document.execCommand("copy", !0, null), events.cancel(c))
         })
     }
