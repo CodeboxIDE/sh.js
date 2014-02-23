@@ -6,13 +6,19 @@
         <script type="text/javascript" src="/sh.js"></script>
     </head>
     <body>
+        <div class="terminal-0 terminal-panel"></div>
+        <div class="terminal-1 terminal-panel"></div>
         <script>
-        $(document).ready(function() {
+        var openTerminal = function(el) {
             var term = new Terminal(80, 6);
-            term.open();
+            term.open($(el).get(0));
+            term._lol = el;
+
             term.sizeToFit();
 
-            var socket = io.connect('http://localhost');
+            var socket = io.connect('http://localhost', {
+                'force new connection': true
+            });
             socket.on('connect', function() {
                 socket.emit("resize", {
                     'w': term.cols,
@@ -38,16 +44,21 @@
                 return term.sizeToFit();
             };
 
-            $(window).focus(function () {
+            /*$(window).focus(function () {
                 return term.focus()
             });
-            $(window).on("touchstart", function (c) {
+            $(el).on("touchstart", function (c) {
                 return term.focus()
             });
-            $(window).on("touchend", function () {
+            $(el).on("touchend", function () {
                 return term.focus()
-            });
+            });*/
             term.element.focus();
+        }
+
+        $(document).ready(function() {
+            openTerminal(".terminal-0");
+            openTerminal(".terminal-1");
         });
         </script>
     </body>

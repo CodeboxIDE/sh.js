@@ -50,11 +50,7 @@ function Terminal(a, k, y) {
     this.setupStops()
 }
 
-var v = window,
-    z = document,
-    s = 1;
-
-console.log(z);
+var s = 1;
 
 utils.inherits(Terminal, events.EventEmitter);
 
@@ -206,44 +202,44 @@ Terminal.prototype.bindKeys = function () {
         events.on(this.inputElement, "keypress", function (c) {
             return a.keyPress(c)
         }, !0);
-        events.on(z, "keydown", function (c) {
+        events.on(document, "keydown", function (c) {
             var k = (isMac && c.metaKey || !isMac && c.ctrlKey) && 67 === c.keyCode;
             a.selectionMode && (!k && 48 <= c.keyCode && 222 >= c.keyCode && -1 === [91, 92, 93, 144, 145].indexOf(c.keyCode)) && a.inputElement.focus();
-            !isMac && (k && c.shiftKey && z.execCommand) && (z.execCommand("copy", !0, null), events.cancel(c))
+            !isMac && (k && c.shiftKey && document.execCommand) && (document.execCommand("copy", !0, null), events.cancel(c))
         })
     }
 };
 
-Terminal.prototype.open = function () {
+Terminal.prototype.open = function (parent) {
         var a = this,
             E = 0,
             y;
-        this.element = z.createElement("div");
+        this.element = document.createElement("div");
         this.element.className = "terminal";
-        for (this.children = []; E < this.rows; E++) y = z.createElement("div"), y.className = "terminal-row", y.setAttribute("data-row", (E + 1).toString()), this.element.appendChild(y), this.children.push(y);
-        this.inputElement = z.createElement("textarea");
+        for (this.children = []; E < this.rows; E++) y = document.createElement("div"), y.className = "terminal-row", y.setAttribute("data-row", (E + 1).toString()), this.element.appendChild(y), this.children.push(y);
+        this.inputElement = document.createElement("textarea");
         this.inputElement.className = "terminal-input";
         this.inputElement.rows = "1";
         this.inputElement.autocorrect = "off";
         this.inputElement.autocapitalize = "off";
-        this.containerElement = z.createElement("div");
+        this.containerElement = document.createElement("div");
         this.containerElement.type = "text";
         this.containerElement.className = "terminal-container";
         this.containerElement.id = "terminal_" + s++;
-        this.sizeIndicatorElement = z.createElement("div");
+        this.sizeIndicatorElement = document.createElement("div");
         this.sizeIndicatorElement.className = "terminal-size-indicator";
         this.sizeIndicatorElement.innerHTML = "80x25";
         this.sizeIndicatorElement.style.display = "none";
-        this.screenKeysElement = z.createElement("div");
+        this.screenKeysElement = document.createElement("div");
         this.screenKeysElement.className = "terminal-screen-keys";
-        this.tabKeyElement = z.createElement("button");
-        this.ctrlKeyElement = z.createElement("button");
-        this.altKeyElement = z.createElement("button");
-        this.escKeyElement = z.createElement("button");
-        this.leftKeyElement = z.createElement("button");
-        this.downKeyElement = z.createElement("button");
-        this.upKeyElement = z.createElement("button");
-        this.rightKeyElement = z.createElement("button");
+        this.tabKeyElement = document.createElement("button");
+        this.ctrlKeyElement = document.createElement("button");
+        this.altKeyElement = document.createElement("button");
+        this.escKeyElement = document.createElement("button");
+        this.leftKeyElement = document.createElement("button");
+        this.downKeyElement = document.createElement("button");
+        this.upKeyElement = document.createElement("button");
+        this.rightKeyElement = document.createElement("button");
         this.tabKeyElement.innerHTML = "Tab";
         this.ctrlKeyElement.innerHTML = "Ctrl";
         this.altKeyElement.innerHTML = "Alt";
@@ -265,8 +261,8 @@ Terminal.prototype.open = function () {
         this.containerElement.appendChild(this.inputElement);
         this.containerElement.appendChild(this.screenKeysElement);
         this.containerElement.appendChild(this.sizeIndicatorElement);
-        z.body.appendChild(this.containerElement);
-        this.screenKeysElement.style.display = v.navigator.userAgent.match(/(iPad|iPhone|Android)/) ? "block" : "none";
+        parent.appendChild(this.containerElement);
+        this.screenKeysElement.style.display = navigator.userAgent.match(/(iPad|iPhone|Android)/) ? "block" : "none";
         this.refresh(0, this.rows - 1);
         this.bindKeys();
         this.focus();
@@ -279,7 +275,7 @@ Terminal.prototype.open = function () {
             }, 1))
         }, !0);
         events.on(this.inputElement, "paste", function (c) {
-            v.setTimeout(function () {
+            setTimeout(function () {
                 a.commitInput("", c)
             }, 20)
         });
@@ -290,13 +286,13 @@ Terminal.prototype.open = function () {
 };
 
 Terminal.prototype.sizeToFit = function () {
-    var a = z.createElement("div");
+    var a = document.createElement("div");
     a.className = "terminal";
     a.style.width = "0";
     a.style.height = "0";
     a.style.visibility =
         "hidden";
-    var c = z.createElement("div");
+    var c = document.createElement("div");
     c.style.position = "absolute";
     c.innerHTML = "W";
     a.appendChild(c);
@@ -379,9 +375,9 @@ Terminal.prototype.bindMouse = function () {
             for (var c = a.pageX, f = a.target;
                 "terminal-row" !== f.className;)
                 if (f = f.parentNode, null == f) return;
-            for (var k = f; k !== z.documentElement;) c -= k.offsetLeft, k = k.parentNode;
+            for (var k = f; k !== document.documentElement;) c -= k.offsetLeft, k = k.parentNode;
             c = Math.ceil(c / f.offsetWidth * s.cols);
-            f = v.parseInt(f.getAttribute("data-row") || 1, 10);
+            f = parseInt(f.getAttribute("data-row") || 1, 10);
             1 > c && (c = 1);
             1 > f && (f = 1);
             c > s.cols && (c = s.cols);
@@ -400,7 +396,7 @@ Terminal.prototype.bindMouse = function () {
     var q = this.element,
         s = this,
         F = 32,
-        p = "onmousewheel" in v ? "mousewheel" : "DOMMouseScroll";
+        p = "onmousewheel" in window ? "mousewheel" : "DOMMouseScroll";
     events.on(q, "mousedown", function (f) {
         if (s.mouseEvents) {
             a(f);
@@ -409,25 +405,25 @@ Terminal.prototype.bindMouse = function () {
                 __proto__: f,
                 type: "mouseup"
             }), events.cancel(f);
-            s.normalMouse && events.on(z, "mousemove", c);
+            s.normalMouse && events.on(document, "mousemove", c);
             if (!s.x10Mouse) {
                 var p = function (f) {
                     a(f);
-                    events.off(z, "mousemove", c);
-                    events.off(z, "mouseup", p);
-                    events.off(z, "mousedown", p);
+                    events.off(document, "mousemove", c);
+                    events.off(document, "mouseup", p);
+                    events.off(document, "mousedown", p);
                     return cancel(f)
                 };
-                events.on(z, "mouseup", p);
-                events.on(z, "mousedown", p)
+                events.on(document, "mouseup", p);
+                events.on(document, "mousedown", p)
             }
             return events.cancel(f)
         }
     });
     events.on(q, "mouseup", function (a) {
-        v.getSelection && 0 < v.getSelection().toString().length && (s.selectionMode = !0);
-        v.setTimeout(function () {
-            v.getSelection && 0 === v.getSelection().toString().length && (s.selectionMode = !1)
+        window.getSelection && 0 < window.getSelection().toString().length && (s.selectionMode = !0);
+        setTimeout(function () {
+            window.getSelection && 0 === window.getSelection().toString().length && (s.selectionMode = !1)
         }, 0)
     });
     events.on(q, "touchend", function (a) {
@@ -1059,11 +1055,11 @@ Terminal.prototype.keyDown = function (a) {
         k = "\u001b[24~";
         break;
     default:
-        if (a.ctrlKey && !a.altKey)!isMac && a.shiftKey && 86 === a.keyCode ? (k = "", v.setTimeout(function () {
-            Terminal.commitInput("", a)
+        if (a.ctrlKey && !a.altKey)!isMac && a.shiftKey && 86 === a.keyCode ? (k = "", setTimeout(function () {
+            c.commitInput("", a)
         }, 20)) : 65 <= a.keyCode && 90 >= a.keyCode ? k = String.fromCharCode(a.keyCode - 64) : 32 === a.keyCode ? k = String.fromCharCode(0) : 51 <= a.keyCode && 55 >= a.keyCode ? k = String.fromCharCode(a.keyCode - 51 + 27) : 56 === a.keyCode ? k = String.fromCharCode(127) : 219 === a.keyCode ? k = String.fromCharCode(27) : 221 === a.keyCode && (k = String.fromCharCode(29));
-        else if (isMac && a.metaKey && 86 === a.keyCode) k = "", v.setTimeout(function () {
-            Terminal.commitInput("", a)
+        else if (isMac && a.metaKey && 86 === a.keyCode) k = "", setTimeout(function () {
+            c.commitInput("", a)
         }, 20);
         else if (!a.ctrlKey && (!isMac && a.altKey || isMac && a.metaKey)) 65 <= a.keyCode && 90 >= a.keyCode ? k = "\u001b" + String.fromCharCode(a.keyCode + 32) : 192 === a.keyCode ? k = "\u001b`" : 48 <= a.keyCode && 57 >= a.keyCode && (k = "\u001b" + (a.keyCode - 48))
     }
@@ -1074,7 +1070,7 @@ Terminal.prototype.keyDown = function (a) {
 
 Terminal.prototype.showBufferedText = function () {
     var a = this.inputElement;
-    v.setTimeout(function () {
+    setTimeout(function () {
         0 < a.value.length && -1 === a.className.indexOf(" visible") &&
             (a.className += " visible")
     }, 0)
@@ -1131,16 +1127,16 @@ Terminal.prototype.bell = function () {
 };
 
 Terminal.prototype.log = function () {
-    if (Terminal.debug && v.console && v.console.log) {
+    if (Terminal.debug && console && console.log) {
         var a = Array.prototype.slice.call(arguments);
-        v.console.log.apply(v.console, a)
+        console.log.apply(console, a)
     }
 };
 
 Terminal.prototype.error = function () {
-    if (Terminal.debug && v.console && v.console.error) {
+    if (Terminal.debug && console && console.error) {
         var a = Array.prototype.slice.call(arguments);
-        v.console.error.apply(v.console, a)
+        console.error.apply(console, a)
     }
 };
 
@@ -1161,7 +1157,7 @@ Terminal.prototype.resize = function (a, c) {
     this.cols = a;
     v = this.rows;
     if (v < c)
-        for (f = this.element; v++ < c;) this.lines.length < c + this.ybase && this.lines.push(this.blankLine()), this.children.length < c && (k = z.createElement("div"), k.className = "terminal-row", k.setAttribute("data-row", v.toString()), f.appendChild(k), this.children.push(k));
+        for (f = this.element; v++ < c;) this.lines.length < c + this.ybase && this.lines.push(this.blankLine()), this.children.length < c && (k = document.createElement("div"), k.className = "terminal-row", k.setAttribute("data-row", v.toString()), f.appendChild(k), this.children.push(k));
     else if (v > c)
         for (; v-- > c;) this.lines.length > c + this.ybase && this.lines.shift(), this.children.length >
             c && (f = this.children.pop()) && f.parentNode.removeChild(f);
@@ -1180,8 +1176,8 @@ Terminal.prototype.showSize = function (a, c) {
     var k = this.sizeIndicatorElement;
     k.innerHTML = a + "x" + c;
     k.style.display = "block";
-    void 0 != this.showSizeTimeout && v.clearTimeout(this.showSizeTimeout);
-    this.showSizeTimeout = v.setTimeout(function () {
+    void 0 != this.showSizeTimeout && clearTimeout(this.showSizeTimeout);
+    this.showSizeTimeout = setTimeout(function () {
         k.style.display = "none"
     }, 2E3)
 };
