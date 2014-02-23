@@ -59,7 +59,10 @@ module.exports = function (grunt) {
                     zip: false
                 },
                 src: [
-                    ".tmp/**"
+                    ".tmp/**",
+                    
+                    // Don't want useless node_modules in app
+                    "!./node_modules/nw-gyp/**",
                 ]
             }
         },
@@ -81,11 +84,15 @@ module.exports = function (grunt) {
                     // Ignore dev related things
                     "!./.tmp/**",
                     "!./.git/**",
+                    
+                    // App builds
+                    "!./apps/**",
 
                     // Ignore some build time only modules
                     "./node_modules/.bin/**",
                     "!./node_modules/grunt/**",
                     "!./node_modules/grunt-*/**",
+                    "!./node_modules/browserify/**",
 
                     // Exclude test directories from node modules
                     "!./node_modules/**/test/**",
