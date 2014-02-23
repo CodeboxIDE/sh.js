@@ -280,27 +280,35 @@ Terminal.prototype.bindKeys = function () {
 };
 
 Terminal.prototype.open = function (parent) {
-        var a = this,
+        var that = this,
             E = 0,
             y;
         this.element = document.createElement("div");
         this.element.className = "terminal";
+        this.element.spellcheck = false;
         for (this.children = []; E < this.rows; E++) y = document.createElement("div"), y.className = "terminal-row", y.setAttribute("data-row", (E + 1).toString()), this.element.appendChild(y), this.children.push(y);
+        
         this.inputElement = document.createElement("textarea");
         this.inputElement.className = "terminal-input";
         this.inputElement.rows = "1";
+        this.inputElement.spellcheck = false;
         this.inputElement.autocorrect = "off";
         this.inputElement.autocapitalize = "off";
+
         this.containerElement = document.createElement("div");
         this.containerElement.type = "text";
+        this.containerElement.spellcheck = false;
         this.containerElement.className = "terminal-container";
         this.containerElement.id = "terminal_" + s++;
+
         this.sizeIndicatorElement = document.createElement("div");
         this.sizeIndicatorElement.className = "terminal-size-indicator";
         this.sizeIndicatorElement.innerHTML = "80x25";
         this.sizeIndicatorElement.style.display = "none";
+
         this.screenKeysElement = document.createElement("div");
         this.screenKeysElement.className = "terminal-screen-keys";
+
         this.tabKeyElement = document.createElement("button");
         this.ctrlKeyElement = document.createElement("button");
         this.altKeyElement = document.createElement("button");
@@ -318,6 +326,7 @@ Terminal.prototype.open = function (parent) {
         this.upKeyElement.innerHTML =
             "\u2191";
         this.rightKeyElement.innerHTML = "\u2192";
+
         this.screenKeysElement.appendChild(this.tabKeyElement);
         this.screenKeysElement.appendChild(this.ctrlKeyElement);
         this.screenKeysElement.appendChild(this.altKeyElement);
@@ -326,26 +335,43 @@ Terminal.prototype.open = function (parent) {
         this.screenKeysElement.appendChild(this.downKeyElement);
         this.screenKeysElement.appendChild(this.upKeyElement);
         this.screenKeysElement.appendChild(this.rightKeyElement);
+
         this.containerElement.appendChild(this.element);
         this.containerElement.appendChild(this.inputElement);
         this.containerElement.appendChild(this.screenKeysElement);
         this.containerElement.appendChild(this.sizeIndicatorElement);
+
         parent.appendChild(this.containerElement);
+
         this.screenKeysElement.style.display = navigator.userAgent.match(/(iPad|iPhone|Android)/) ? "block" : "none";
         this.refresh(0, this.rows - 1);
         this.bindKeys();
         this.focus();
-        events.on(this.element, "mousedown", function (c) {
-            c = null != c.button ? +c.button : null != c.which ? c.which - 1 : null;~
-            navigator.userAgent.indexOf("MSIE") &&
-                (c = 1 === c ? 0 : 4 === c ? 1 : c);
-            2 === c && (a.element.contentEditable = "true", setTimeout(function () {
-                a.element.contentEditable = "inherit"
-            }, 1))
+
+        events.on(this.element, "mousedown", function (ev) {
+            var button = ev.button != null
+                ? +ev.button
+                : ev.which != null
+                    ? ev.which - 1
+                    : null;
+
+            // Does IE9 do this?
+            if (Terminal.isMSIE) {
+                button = button === 1 ? 0 : button === 4 ? 1 : button;
+            }
+
+            if (button !== 2) return;
+            
+            that.element.contentEditable = true;
+            that.element.focus();
+            setTimeout(function() {
+                that.inputElement.focus();
+                that.element.contentEditable = 'inherit'; // 'false';
+            }, 1);
         }, !0);
         events.on(this.inputElement, "paste", function (c) {
             setTimeout(function () {
-                a.commitInput("", c)
+                that.commitInput("", c)
             }, 20)
         });
         this.bindMouse();
@@ -1874,6 +1900,7 @@ Terminal.charsets.Swiss = null;
 Terminal.charsets.ISOLatin = null;
 var isMac = ~navigator.userAgent.indexOf("Mac");
 Terminal.isMac = isMac;
+Terminal.isMSIE = ~navigator.userAgent.indexOf("MSIE");
 
 
 module.exports = Terminal;

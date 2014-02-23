@@ -11,7 +11,7 @@ app.configure(function () {
     app.use(express.static(__dirname + '/public'));
 });
  
-var server = http.createServer(app).listen(5000);
+var server = http.createServer(app);
 var sio = io.listen(server);
  
 sio.sockets.on('connection', function (socket) {
@@ -36,4 +36,11 @@ sio.sockets.on('connection', function (socket) {
     socket.on('resize', function (data) {
         term.resize(data.w, data.h);
     });
+});
+
+var port = 5000;
+var host = "0.0.0.0";
+
+server.listen(port, host, function() {
+  console.log("Listening on %s:%d in %s mode", host, port, app.settings.env);
 });

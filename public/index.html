@@ -15,7 +15,7 @@
 
             term.sizeToFit();
 
-            var socket = io.connect('http://localhost', {
+            var socket = io.connect([window.location.protocol, '//', window.location.host].join(''), {
                 'force new connection': true
             });
             socket.on('connect', function() {
