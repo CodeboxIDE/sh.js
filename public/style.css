@@ -1,12 +1,17 @@
+* {
+    box-sizing: border-box;
+}
+
 body {
     margin: 0px;
     padding: 3px;
-    background: #000;
+    background: #ddd;
 }
 
 .terminal-panel {
     width: 100%;
     height: 50%;
+    padding: 8px;
 }
 
 .terminal-container {

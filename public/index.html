@@ -12,7 +12,6 @@
         var openTerminal = function(el) {
             var term = new Terminal(80, 6);
             term.open($(el).get(0));
-            term._lol = el;
 
             term.sizeToFit();
 
@@ -46,13 +45,13 @@
 
             /*$(window).focus(function () {
                 return term.focus()
-            });
+            });*/
             $(el).on("touchstart", function (c) {
                 return term.focus()
             });
             $(el).on("touchend", function () {
                 return term.focus()
-            });*/
+            });
             term.element.focus();
         }
 
