@@ -936,6 +936,10 @@ Terminal.prototype.keyDown = function (a) {
         if (a.shiftKey) {
             k = "\b";
             break
+        } else if (a.altKey) {
+            // Deletes previous word
+            k = '\x17';
+            break;
         }
         k = "\u007f";
         break;
