@@ -5,11 +5,10 @@ var io = require('socket.io'),
 
 
 var app = express();
- 
-app.configure(function () {
-    app.use(express.cookieParser());
-    app.use(express.static(__dirname + '/public'));
-});
+
+app.use(express.cookieParser());
+app.use(express.static(__dirname + '/public'));
+app.use(express.static(__dirname + '/build'));
  
 var server = http.createServer(app);
 var sio = io.listen(server);
@@ -42,5 +41,5 @@ var port = 5000;
 var host = "0.0.0.0";
 
 server.listen(port, host, function() {
-  console.log("Listening on %s:%d in %s mode", host, port, app.settings.env);
+    console.log("Listening on %s:%d in %s mode", host, port, app.settings.env);
 });

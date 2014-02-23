@@ -11,6 +11,6 @@ logs
 results
 
 npm-debug.log
-settings.json
 /node_modules/
-
+/.tmp
+/apps
