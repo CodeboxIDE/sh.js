@@ -43,9 +43,9 @@
                 });
             });
 
-            window.onresize = function () {
+            $(window).resize(function () {
                 return term.sizeToFit();
-            };
+            });
 
             /*$(window).focus(function () {
                 return term.focus()
