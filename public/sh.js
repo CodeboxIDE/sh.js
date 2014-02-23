@@ -1170,12 +1170,12 @@ Terminal.prototype.keyPress = function (a) {
 };
 
 Terminal.prototype.send = function (a) {
-    var c = this;
+    var that = this;
     this.queue || setTimeout(function () {
-        Terminal.handler(Terminal.queue);
+        that.handler(Terminal.queue);
         Terminal.queue = ""
     }, 1);
-    this.queue += a
+    this.queue += a;
 };
 
 Terminal.prototype.bell = function () {
@@ -1869,6 +1869,8 @@ Terminal.charsets.ISOLatin = null;
 
 Terminal.isMac = ~navigator.userAgent.indexOf("Mac");
 Terminal.isMSIE = ~navigator.userAgent.indexOf("MSIE");
+
+Terminal.themes = themes;
 
 
 module.exports = Terminal;
