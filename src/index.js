@@ -1,15 +1,27 @@
 var events = require("./events");
 var utils = require("./utils");
+var themes = require("./themes");
 
 function Terminal(a, k, y) {
     events.EventEmitter.call(this);
 
     var f;
     "object" === typeof a && (f = a, a = f.cols, k = f.rows, y = f.handler);
+
     this._options = f || {};
+
     this.cols = a || Terminal.geometry[0];
     this.rows = k || Terminal.geometry[1];
+
     if (y) this.on("data", y);
+
+    // Theme
+    var theme = this._options.theme || "default";
+    if (typeof theme == 'string' || theme instanceof String) {
+        theme = themes.defaults[theme];
+    }
+    if (theme) this.colors = themes.colors(theme);
+
     this.cursorState = this.y = this.x = this.ydisp = this.ybase = 0;
     this.convertEol = this.cursorHidden = !1;
     this.state = 0;
@@ -55,50 +67,6 @@ var s = 1;
 utils.inherits(Terminal, events.EventEmitter);
 
 
-Terminal.colors = [
-    "#000000",
-    "#c81908",
-    "#00c01d",
-    "#c8c221",
-    "#0033c5",
-    "#c73ac5",
-    "#00c6c7",
-    "#c7c7c7",
-    "#686868",
-    "#8a8a8a",
-    "#67f86e",
-    "#fff970",
-    "#6678fc",
-    "#ff7cfd",
-    "#65fdff",
-    "#ffffff"
-];
-
-
-Terminal.colors = function () {
-    function a(a, c, f) {
-        y.push("#" + k(a) + k(c) + k(f))
-    }
-
-    function k(a) {
-        a = a.toString(16);
-        return 2 > a.length ? "0" + a : a
-    }
-    var y = Terminal.colors,
-        f = [0, 95, 135, 175, 215, 255],
-        v;
-    for (v = 0; 216 > v; v++) a(f[v / 36 % 6 | 0], f[v / 6 % 6 | 0], f[v % 6]);
-    for (v = 0; 24 > v; v++) f = 8 + 10 * v, a(f, f, f);
-    return y
-}();
-
-Terminal.defaultColors = {
-    bg: "#000000",
-    fg: "#f0f0f0"
-};
-
-Terminal.colors[256] = Terminal.defaultColors.bg;
-Terminal.colors[257] = Terminal.defaultColors.fg;
 Terminal.termName = "xterm";
 Terminal.geometry = [80, 24];
 Terminal.visualBell = !1;
@@ -203,9 +171,9 @@ Terminal.prototype.bindKeys = function () {
             return that.keyPress(c)
         }, !0);
         events.on(document, "keydown", function (c) {
-            var k = (isMac && c.metaKey || !isMac && c.ctrlKey) && 67 === c.keyCode;
+            var k = (Terminal.isMac && c.metaKey || !Terminal.isMac && c.ctrlKey) && 67 === c.keyCode;
             that.selectionMode && (!k && 48 <= c.keyCode && 222 >= c.keyCode && -1 === [91, 92, 93, 144, 145].indexOf(c.keyCode)) && that.inputElement.focus();
-            !isMac && (k && c.shiftKey && document.execCommand) && (document.execCommand("copy", !0, null), events.cancel(c))
+            !Terminal.isMac && (k && c.shiftKey && document.execCommand) && (document.execCommand("copy", !0, null), events.cancel(c))
         })
     }
 };
@@ -307,8 +275,8 @@ Terminal.prototype.open = function (parent) {
         });
         this.bindMouse();
         null == Terminal.brokenBold && (Terminal.brokenBold = utils.isBoldBroken());
-        this.element.style.backgroundColor = Terminal.defaultColors.bg;
-        this.element.style.color = Terminal.defaultColors.fg
+        this.element.style.backgroundColor = this.colors[256];
+        this.element.style.color = this.colors[257];
 };
 
 Terminal.prototype.sizeToFit = function () {
@@ -489,8 +457,8 @@ Terminal.prototype.refresh = function (a, k) {
             q = z[v][0];
             u = z[v][1];
             v === y && (t = q, q = -1);
-            q !== x && (x !== this.defAttr && (s += "</span>"), q !== this.defAttr && (s += "<span ", -1 === q ? (s += 'class="terminal-cursor" ', L ? (F = t >> 9 & 511, x = t & 511) : (F = t & 511, x = t >> 9 & 511), A = t >> 18) : (F = q & 511, x = q >> 9 & 511, A = q >> 18), s += 'style="', !L && -1 === q && (s += "outline:1px solid " + Terminal.colors[x] + ";"), A & 1 && (Terminal.brokenBold || (s += "font-weight:bold;"), 8 > x && (x += 8)), A & 2 && (s += "text-decoration:underline;"), 256 !== F && (s += "background-color:" +
-                Terminal.colors[F] + ";"), 257 !== x && (s += "color:" + Terminal.colors[x] + ";"), s += '">'));
+            q !== x && (x !== this.defAttr && (s += "</span>"), q !== this.defAttr && (s += "<span ", -1 === q ? (s += 'class="terminal-cursor" ', L ? (F = t >> 9 & 511, x = t & 511) : (F = t & 511, x = t >> 9 & 511), A = t >> 18) : (F = q & 511, x = q >> 9 & 511, A = q >> 18), s += 'style="', !L && -1 === q && (s += "outline:1px solid " + this.colors[x] + ";"), A & 1 && (Terminal.brokenBold || (s += "font-weight:bold;"), 8 > x && (x += 8)), A & 2 && (s += "text-decoration:underline;"), 256 !== F && (s += "background-color:" +
+                this.colors[F] + ";"), 257 !== x && (s += "color:" + this.colors[x] + ";"), s += '">'));
             switch (u) {
             case "&":
                 s += "&amp;";
@@ -1081,13 +1049,13 @@ Terminal.prototype.keyDown = function (a) {
         k = "\u001b[24~";
         break;
     default:
-        if (a.ctrlKey && !a.altKey)!isMac && a.shiftKey && 86 === a.keyCode ? (k = "", setTimeout(function () {
+        if (a.ctrlKey && !a.altKey)!Terminal.isMac && a.shiftKey && 86 === a.keyCode ? (k = "", setTimeout(function () {
             c.commitInput("", a)
         }, 20)) : 65 <= a.keyCode && 90 >= a.keyCode ? k = String.fromCharCode(a.keyCode - 64) : 32 === a.keyCode ? k = String.fromCharCode(0) : 51 <= a.keyCode && 55 >= a.keyCode ? k = String.fromCharCode(a.keyCode - 51 + 27) : 56 === a.keyCode ? k = String.fromCharCode(127) : 219 === a.keyCode ? k = String.fromCharCode(27) : 221 === a.keyCode && (k = String.fromCharCode(29));
-        else if (isMac && a.metaKey && 86 === a.keyCode) k = "", setTimeout(function () {
+        else if (Terminal.isMac && a.metaKey && 86 === a.keyCode) k = "", setTimeout(function () {
             c.commitInput("", a)
         }, 20);
-        else if (!a.ctrlKey && (!isMac && a.altKey || isMac && a.metaKey)) 65 <= a.keyCode && 90 >= a.keyCode ? k = "\u001b" + String.fromCharCode(a.keyCode + 32) : 192 === a.keyCode ? k = "\u001b`" : 48 <= a.keyCode && 57 >= a.keyCode && (k = "\u001b" + (a.keyCode - 48))
+        else if (!a.ctrlKey && (!Terminal.isMac && a.altKey || Terminal.isMac && a.metaKey)) 65 <= a.keyCode && 90 >= a.keyCode ? k = "\u001b" + String.fromCharCode(a.keyCode + 32) : 192 === a.keyCode ? k = "\u001b`" : 48 <= a.keyCode && 57 >= a.keyCode && (k = "\u001b" + (a.keyCode - 48))
     }
     if (k) return this.commitInput(k, a), events.cancel(a);
     "" !== k && this.showBufferedText();
@@ -1829,8 +1797,8 @@ Terminal.charsets.Spanish = null;
 Terminal.charsets.Swedish = null;
 Terminal.charsets.Swiss = null;
 Terminal.charsets.ISOLatin = null;
-var isMac = ~navigator.userAgent.indexOf("Mac");
-Terminal.isMac = isMac;
+
+Terminal.isMac = ~navigator.userAgent.indexOf("Mac");
 Terminal.isMSIE = ~navigator.userAgent.indexOf("MSIE");
 
 

@@ -69,16 +69,28 @@ module.exports= {
 },{}],2:[function(_dereq_,module,exports){
 var events = _dereq_("./events");
 var utils = _dereq_("./utils");
+var themes = _dereq_("./themes");
 
 function Terminal(a, k, y) {
     events.EventEmitter.call(this);
 
     var f;
     "object" === typeof a && (f = a, a = f.cols, k = f.rows, y = f.handler);
+
     this._options = f || {};
+
     this.cols = a || Terminal.geometry[0];
     this.rows = k || Terminal.geometry[1];
+
     if (y) this.on("data", y);
+
+    // Theme
+    var theme = this._options.theme || "default";
+    if (typeof theme == 'string' || theme instanceof String) {
+        theme = themes.defaults[theme];
+    }
+    if (theme) this.colors = themes.colors(theme);
+
     this.cursorState = this.y = this.x = this.ydisp = this.ybase = 0;
     this.convertEol = this.cursorHidden = !1;
     this.state = 0;
@@ -124,50 +136,6 @@ var s = 1;
 utils.inherits(Terminal, events.EventEmitter);
 
 
-Terminal.colors = [
-    "#000000",
-    "#c81908",
-    "#00c01d",
-    "#c8c221",
-    "#0033c5",
-    "#c73ac5",
-    "#00c6c7",
-    "#c7c7c7",
-    "#686868",
-    "#8a8a8a",
-    "#67f86e",
-    "#fff970",
-    "#6678fc",
-    "#ff7cfd",
-    "#65fdff",
-    "#ffffff"
-];
-
-
-Terminal.colors = function () {
-    function a(a, c, f) {
-        y.push("#" + k(a) + k(c) + k(f))
-    }
-
-    function k(a) {
-        a = a.toString(16);
-        return 2 > a.length ? "0" + a : a
-    }
-    var y = Terminal.colors,
-        f = [0, 95, 135, 175, 215, 255],
-        v;
-    for (v = 0; 216 > v; v++) a(f[v / 36 % 6 | 0], f[v / 6 % 6 | 0], f[v % 6]);
-    for (v = 0; 24 > v; v++) f = 8 + 10 * v, a(f, f, f);
-    return y
-}();
-
-Terminal.defaultColors = {
-    bg: "#000000",
-    fg: "#f0f0f0"
-};
-
-Terminal.colors[256] = Terminal.defaultColors.bg;
-Terminal.colors[257] = Terminal.defaultColors.fg;
 Terminal.termName = "xterm";
 Terminal.geometry = [80, 24];
 Terminal.visualBell = !1;
@@ -272,9 +240,9 @@ Terminal.prototype.bindKeys = function () {
             return that.keyPress(c)
         }, !0);
         events.on(document, "keydown", function (c) {
-            var k = (isMac && c.metaKey || !isMac && c.ctrlKey) && 67 === c.keyCode;
+            var k = (Terminal.isMac && c.metaKey || !Terminal.isMac && c.ctrlKey) && 67 === c.keyCode;
             that.selectionMode && (!k && 48 <= c.keyCode && 222 >= c.keyCode && -1 === [91, 92, 93, 144, 145].indexOf(c.keyCode)) && that.inputElement.focus();
-            !isMac && (k && c.shiftKey && document.execCommand) && (document.execCommand("copy", !0, null), events.cancel(c))
+            !Terminal.isMac && (k && c.shiftKey && document.execCommand) && (document.execCommand("copy", !0, null), events.cancel(c))
         })
     }
 };
@@ -376,8 +344,8 @@ Terminal.prototype.open = function (parent) {
         });
         this.bindMouse();
         null == Terminal.brokenBold && (Terminal.brokenBold = utils.isBoldBroken());
-        this.element.style.backgroundColor = Terminal.defaultColors.bg;
-        this.element.style.color = Terminal.defaultColors.fg
+        this.element.style.backgroundColor = this.colors[256];
+        this.element.style.color = this.colors[257];
 };
 
 Terminal.prototype.sizeToFit = function () {
@@ -558,8 +526,8 @@ Terminal.prototype.refresh = function (a, k) {
             q = z[v][0];
             u = z[v][1];
             v === y && (t = q, q = -1);
-            q !== x && (x !== this.defAttr && (s += "</span>"), q !== this.defAttr && (s += "<span ", -1 === q ? (s += 'class="terminal-cursor" ', L ? (F = t >> 9 & 511, x = t & 511) : (F = t & 511, x = t >> 9 & 511), A = t >> 18) : (F = q & 511, x = q >> 9 & 511, A = q >> 18), s += 'style="', !L && -1 === q && (s += "outline:1px solid " + Terminal.colors[x] + ";"), A & 1 && (Terminal.brokenBold || (s += "font-weight:bold;"), 8 > x && (x += 8)), A & 2 && (s += "text-decoration:underline;"), 256 !== F && (s += "background-color:" +
-                Terminal.colors[F] + ";"), 257 !== x && (s += "color:" + Terminal.colors[x] + ";"), s += '">'));
+            q !== x && (x !== this.defAttr && (s += "</span>"), q !== this.defAttr && (s += "<span ", -1 === q ? (s += 'class="terminal-cursor" ', L ? (F = t >> 9 & 511, x = t & 511) : (F = t & 511, x = t >> 9 & 511), A = t >> 18) : (F = q & 511, x = q >> 9 & 511, A = q >> 18), s += 'style="', !L && -1 === q && (s += "outline:1px solid " + this.colors[x] + ";"), A & 1 && (Terminal.brokenBold || (s += "font-weight:bold;"), 8 > x && (x += 8)), A & 2 && (s += "text-decoration:underline;"), 256 !== F && (s += "background-color:" +
+                this.colors[F] + ";"), 257 !== x && (s += "color:" + this.colors[x] + ";"), s += '">'));
             switch (u) {
             case "&":
                 s += "&amp;";
@@ -1150,13 +1118,13 @@ Terminal.prototype.keyDown = function (a) {
         k = "\u001b[24~";
         break;
     default:
-        if (a.ctrlKey && !a.altKey)!isMac && a.shiftKey && 86 === a.keyCode ? (k = "", setTimeout(function () {
+        if (a.ctrlKey && !a.altKey)!Terminal.isMac && a.shiftKey && 86 === a.keyCode ? (k = "", setTimeout(function () {
             c.commitInput("", a)
         }, 20)) : 65 <= a.keyCode && 90 >= a.keyCode ? k = String.fromCharCode(a.keyCode - 64) : 32 === a.keyCode ? k = String.fromCharCode(0) : 51 <= a.keyCode && 55 >= a.keyCode ? k = String.fromCharCode(a.keyCode - 51 + 27) : 56 === a.keyCode ? k = String.fromCharCode(127) : 219 === a.keyCode ? k = String.fromCharCode(27) : 221 === a.keyCode && (k = String.fromCharCode(29));
-        else if (isMac && a.metaKey && 86 === a.keyCode) k = "", setTimeout(function () {
+        else if (Terminal.isMac && a.metaKey && 86 === a.keyCode) k = "", setTimeout(function () {
             c.commitInput("", a)
         }, 20);
-        else if (!a.ctrlKey && (!isMac && a.altKey || isMac && a.metaKey)) 65 <= a.keyCode && 90 >= a.keyCode ? k = "\u001b" + String.fromCharCode(a.keyCode + 32) : 192 === a.keyCode ? k = "\u001b`" : 48 <= a.keyCode && 57 >= a.keyCode && (k = "\u001b" + (a.keyCode - 48))
+        else if (!a.ctrlKey && (!Terminal.isMac && a.altKey || Terminal.isMac && a.metaKey)) 65 <= a.keyCode && 90 >= a.keyCode ? k = "\u001b" + String.fromCharCode(a.keyCode + 32) : 192 === a.keyCode ? k = "\u001b`" : 48 <= a.keyCode && 57 >= a.keyCode && (k = "\u001b" + (a.keyCode - 48))
     }
     if (k) return this.commitInput(k, a), events.cancel(a);
     "" !== k && this.showBufferedText();
@@ -1898,13 +1866,709 @@ Terminal.charsets.Spanish = null;
 Terminal.charsets.Swedish = null;
 Terminal.charsets.Swiss = null;
 Terminal.charsets.ISOLatin = null;
-var isMac = ~navigator.userAgent.indexOf("Mac");
-Terminal.isMac = isMac;
+
+Terminal.isMac = ~navigator.userAgent.indexOf("Mac");
 Terminal.isMSIE = ~navigator.userAgent.indexOf("MSIE");
 
 
 module.exports = Terminal;
-},{"./events":1,"./utils":3}],3:[function(_dereq_,module,exports){
+},{"./events":1,"./themes":3,"./utils":4}],3:[function(_dereq_,module,exports){
+
+var initColors = function (colors) {
+    function a(a, c, f) {
+        y.push("#" + k(a) + k(c) + k(f))
+    }
+
+    function k(a) {
+        a = a.toString(16);
+        return 2 > a.length ? "0" + a : a
+    }
+    var y = colors,
+        f = [0, 95, 135, 175, 215, 255],
+        v;
+    for (v = 0; 216 > v; v++) a(f[v / 36 % 6 | 0], f[v / 6 % 6 | 0], f[v % 6]);
+    for (v = 0; 24 > v; v++) f = 8 + 10 * v, a(f, f, f);
+    return y
+};
+
+// Return colors for a theme
+var colors = function(theme) {
+    // Copy pallette
+    var colors = theme.palette;
+
+    // Set background and forground colors if available
+    colors[256] = theme.background || "#000000";
+    colors[257] = theme.foreground || "#f0f0f0";
+
+    return initColors(colors);
+};
+
+var defaults = {
+    "default":{
+        "palette": [
+             "#000000",
+            "#c81908",
+            "#00c01d",
+            "#c8c221",
+            "#0033c5",
+            "#c73ac5",
+            "#00c6c7",
+            "#c7c7c7",
+            "#686868",
+            "#8a8a8a",
+            "#67f86e",
+            "#fff970",
+            "#6678fc",
+            "#ff7cfd",
+            "#65fdff",
+            "#ffffff"
+        ]
+    },
+    "blazer":{
+        "palette":[
+            "#262626",
+            "#dbbdbd",
+            "#bddbbd",
+            "#dbdbbd",
+            "#bdbddb",
+            "#dbbddb",
+            "#bddbdb",
+            "#ffffff"
+        ],
+        "name":"blazer"
+    },
+    "chalkboard":{
+        "foreground":"#d9e6f2",
+        "background":"#29262f",
+        "cursor":"#d9e6f2",
+        "cursor_text":"#29262f",
+        "palette":[
+            "#000000",
+            "#c37372",
+            "#72c373",
+            "#c2c372",
+            "#7372c3",
+            "#c372c2",
+            "#72c2c3",
+            "#d9d9d9",
+            "#323232",
+            "#dbaaaa",
+            "#aadbaa",
+            "#dadbaa",
+            "#aaaadb",
+            "#dbaada",
+            "#aadadb",
+            "#ffffff"
+        ],
+        "name":"chalkboard"
+    },
+    "dark_pastel":{
+        "foreground":"#ffffff",
+        "background":"#000000",
+        "cursor":"#bbbbbb",
+        "cursor_text":"#ffffff",
+        "palette":[
+            "#000000",
+            "#ff5555",
+            "#55ff55",
+            "#ffff55",
+            "#5555ff",
+            "#ff55ff",
+            "#55ffff",
+            "#bbbbbb",
+            "#555555",
+            "#ff5555",
+            "#55ff55",
+            "#ffff55",
+            "#5555ff",
+            "#ff55ff",
+            "#55ffff",
+            "#ffffff"
+        ],
+        "name":"dark_pastel"
+    },
+    "desert":{
+        "foreground":"#ffffff",
+        "background":"#333333",
+        "cursor":"#00ff00",
+        "cursor_text":"#000000",
+        "palette":[
+            "#4d4d4d",
+            "#ff2b2b",
+            "#98fb98",
+            "#f0e68c",
+            "#cd853f",
+            "#ffdead",
+            "#ffa0a0",
+            "#f5deb3",
+            "#555555",
+            "#ff5555",
+            "#55ff55",
+            "#ffff55",
+            "#87ceff",
+            "#ff55ff",
+            "#ffd700",
+            "#ffffff"
+        ],
+        "name":"desert"
+    },
+    "espresso":{
+        "foreground":"#ffffff",
+        "background":"#323232",
+        "cursor":"#d6d6d6",
+        "cursor_text":"#ffffff",
+        "palette":[
+            "#343434",
+            "#d25151",
+            "#a5c261",
+            "#ffc66d",
+            "#6c99bb",
+            "#d197d9",
+            "#bed6ff",
+            "#eeeeec",
+            "#535353",
+            "#f00c0c",
+            "#c2e075",
+            "#e1e38b",
+            "#8ab7d9",
+            "#efb5f7",
+            "#dcf3ff",
+            "#ffffff"
+        ],
+        "name":"espresso"
+    },
+    "github":{
+        "foreground":"#3e3e3e",
+        "background":"#f4f4f4",
+        "cursor":"#3f3f3f",
+        "cursor_text":"#f4f4f4",
+        "palette":[
+            "#3e3e3e",
+            "#970b16",
+            "#07962a",
+            "#f8eec7",
+            "#003e8a",
+            "#e94691",
+            "#89d1ec",
+            "#ffffff",
+            "#666666",
+            "#de0000",
+            "#87d5a2",
+            "#f1d007",
+            "#2e6cba",
+            "#ffa29f",
+            "#1cfafe",
+            "#ffffff"
+        ],
+        "name":"github"
+    },
+    "grass":{
+        "foreground":"#fff0a5",
+        "background":"#13773c",
+        "cursor":"#8c2800",
+        "cursor_text":"#ffffff",
+        "palette":[
+            "#000000",
+            "#bb0000",
+            "#00bb00",
+            "#e7b000",
+            "#0000a3",
+            "#950061",
+            "#00bbbb",
+            "#bbbbbb",
+            "#555555",
+            "#bb0000",
+            "#00bb00",
+            "#e7b000",
+            "#0000bb",
+            "#ff55ff",
+            "#55ffff",
+            "#ffffff"
+        ],
+        "name":"grass"
+    },
+    "homebrew":{
+        "foreground":"#00ff00",
+        "background":"#000000",
+        "cursor":"#23ff18",
+        "cursor_text":"#ff0017",
+        "palette":[
+            "#000000",
+            "#990000",
+            "#00a600",
+            "#999900",
+            "#0000b2",
+            "#b200b2",
+            "#00a6b2",
+            "#bfbfbf",
+            "#666666",
+            "#e50000",
+            "#00d900",
+            "#e5e500",
+            "#0000ff",
+            "#e500e5",
+            "#00e5e5",
+            "#e5e5e5"
+        ],
+        "name":"homebrew"
+    },
+    "hurtado":{
+        "foreground":"#dadbda",
+        "background":"#000000",
+        "cursor":"#bbbbbb",
+        "cursor_text":"#ffffff",
+        "palette":[
+            "#575757",
+            "#ff1b00",
+            "#a5df55",
+            "#fbe74a",
+            "#486387",
+            "#fc5ef0",
+            "#85e9fe",
+            "#cbcbcb",
+            "#252525",
+            "#d41c00",
+            "#a5df55",
+            "#fbe749",
+            "#89bdff",
+            "#bf00c0",
+            "#85e9fe",
+            "#dbdbdb"
+        ],
+        "name":"hurtado"
+    },
+    "idletoes":{
+        "foreground":"#ffffff",
+        "background":"#323232",
+        "cursor":"#d6d6d6",
+        "cursor_text":"#000000",
+        "palette":[
+            "#323232",
+            "#d25252",
+            "#7fe173",
+            "#ffc66d",
+            "#4098ff",
+            "#f57fff",
+            "#bed6ff",
+            "#eeeeec",
+            "#535353",
+            "#f07070",
+            "#9dff90",
+            "#ffe48b",
+            "#5eb7f7",
+            "#ff9dff",
+            "#dcf4ff",
+            "#ffffff"
+        ],
+        "name":"idletoes"
+    },
+    "kibble":{
+        "foreground":"#f7f7f7",
+        "background":"#0e100a",
+        "cursor":"#9fda9c",
+        "cursor_text":"#000000",
+        "palette":[
+            "#4d4d4d",
+            "#c70031",
+            "#29cf13",
+            "#d8e30e",
+            "#3449d1",
+            "#8400ff",
+            "#0798ab",
+            "#e2d1e3",
+            "#5a5a5a",
+            "#f01578",
+            "#6ce05c",
+            "#f3f79e",
+            "#97a4f7",
+            "#c495f0",
+            "#68f2e0",
+            "#ffffff"
+        ],
+        "name":"kibble"
+    },
+    "man_page":{
+        "foreground":"#000000",
+        "background":"#fef49c",
+        "cursor":"#7f7f7f",
+        "cursor_text":"#000000",
+        "palette":[
+            "#000000",
+            "#cc0000",
+            "#00a600",
+            "#999900",
+            "#0000b2",
+            "#b200b2",
+            "#00a6b2",
+            "#cccccc",
+            "#666666",
+            "#e50000",
+            "#00d900",
+            "#e5e500",
+            "#0000ff",
+            "#e500e5",
+            "#00e5e5",
+            "#e5e5e5"
+        ],
+        "name":"man_page"
+    },
+    "monokai_soda":{
+        "foreground":"#c4c4b5",
+        "background":"#191919",
+        "cursor":"#f6f6ec",
+        "cursor_text":"#c4c4b5",
+        "palette":[
+            "#191919",
+            "#f3005f",
+            "#97e023",
+            "#fa8419",
+            "#9c64fe",
+            "#f3005f",
+            "#57d1ea",
+            "#c4c4b5",
+            "#615e4b",
+            "#f3005f",
+            "#97e023",
+            "#dfd561",
+            "#9c64fe",
+            "#f3005f",
+            "#57d1ea",
+            "#f6f6ee"
+        ],
+        "name":"monokai_soda"
+    },
+    "neopolitan":{
+        "foreground":"#ffffff",
+        "background":"#17130f",
+        "cursor":"#ffffff",
+        "cursor_text":"#ffffff",
+        "palette":[
+            "#17130f",
+            "#800000",
+            "#61ce3c",
+            "#fbde2d",
+            "#253b76",
+            "#ff0080",
+            "#8da6ce",
+            "#f8f8f8",
+            "#17130f",
+            "#800000",
+            "#61ce3c",
+            "#fbde2d",
+            "#253b76",
+            "#ff0080",
+            "#8da6ce",
+            "#f8f8f8"
+        ],
+        "name":"neopolitan"
+    },
+    "novel":{
+        "foreground":"#3b2322",
+        "background":"#dfdbc3",
+        "cursor":"#73635a",
+        "cursor_text":"#000000",
+        "palette":[
+            "#000000",
+            "#cc0000",
+            "#009600",
+            "#d06b00",
+            "#0000cc",
+            "#cc00cc",
+            "#0087cc",
+            "#cccccc",
+            "#7f7f7f",
+            "#cc0000",
+            "#009600",
+            "#d06b00",
+            "#0000cc",
+            "#cc00cc",
+            "#0086cb",
+            "#ffffff"
+        ],
+        "name":"novel"
+    },
+    "ocean":{
+        "foreground":"#ffffff",
+        "background":"#224fbc",
+        "cursor":"#7f7f7f",
+        "cursor_text":"#ffffff",
+        "palette":[
+            "#000000",
+            "#990000",
+            "#00a600",
+            "#999900",
+            "#0000b2",
+            "#b200b2",
+            "#00a6b2",
+            "#bfbfbf",
+            "#666666",
+            "#e50000",
+            "#00d900",
+            "#e5e500",
+            "#0000ff",
+            "#e500e5",
+            "#00e5e5",
+            "#e5e5e5"
+        ],
+        "name":"ocean"
+    },
+    "pro":{
+        "foreground":"#f2f2f2",
+        "background":"#000000",
+        "cursor":"#4d4d4d",
+        "cursor_text":"#ffffff",
+        "palette":[
+            "#000000",
+            "#990000",
+            "#00a600",
+            "#999900",
+            "#1f08db",
+            "#b200b2",
+            "#00a6b2",
+            "#bfbfbf",
+            "#666666",
+            "#e50000",
+            "#00d900",
+            "#e5e500",
+            "#0000ff",
+            "#e500e5",
+            "#00e5e5",
+            "#e5e5e5"
+        ],
+        "name":"pro"
+    },
+    "red_sands":{
+        "foreground":"#d7c9a7",
+        "background":"#79241e",
+        "cursor":"#ffffff",
+        "cursor_text":"#000000",
+        "palette":[
+            "#000000",
+            "#ff3f00",
+            "#00bb00",
+            "#e7b000",
+            "#0071ff",
+            "#bb00bb",
+            "#00bbbb",
+            "#bbbbbb",
+            "#555555",
+            "#bb0000",
+            "#00bb00",
+            "#e7b000",
+            "#0071ae",
+            "#ff55ff",
+            "#55ffff",
+            "#ffffff"
+        ],
+        "name":"red_sands"
+    },
+    "seafoam_pastel":{
+        "foreground":"#d3e7d3",
+        "background":"#243434",
+        "cursor":"#576479",
+        "cursor_text":"#323232",
+        "palette":[
+            "#757575",
+            "#825d4d",
+            "#718c61",
+            "#ada16d",
+            "#4d7b82",
+            "#8a7167",
+            "#719393",
+            "#e0e0e0",
+            "#8a8a8a",
+            "#cf9379",
+            "#98d9aa",
+            "#fae79d",
+            "#79c3cf",
+            "#d6b2a1",
+            "#ade0e0",
+            "#e0e0e0"
+        ],
+        "name":"seafoam_pastel"
+    },
+    "solarized_darcula":{
+        "foreground":"#d2d8d9",
+        "background":"#3d3f41",
+        "cursor":"#708183",
+        "cursor_text":"#002731",
+        "palette":[
+            "#25292a",
+            "#f24840",
+            "#629655",
+            "#b68800",
+            "#2075c7",
+            "#797fd4",
+            "#15968d",
+            "#d2d8d9",
+            "#25292a",
+            "#f24840",
+            "#629655",
+            "#b68800",
+            "#2075c7",
+            "#797fd4",
+            "#15968d",
+            "#d2d8d9"
+        ],
+        "name":"solarized_darcula"
+    },
+    "solarized_dark":{
+        "foreground":"#708183",
+        "background":"#001e26",
+        "cursor":"#708183",
+        "cursor_text":"#002731",
+        "palette":[
+            "#002731",
+            "#d01b24",
+            "#728905",
+            "#a57705",
+            "#2075c7",
+            "#c61b6e",
+            "#259185",
+            "#e9e2cb",
+            "#001e26",
+            "#bd3612",
+            "#465a61",
+            "#52676f",
+            "#708183",
+            "#5856b9",
+            "#81908f",
+            "#fcf4dc"
+        ],
+        "name":"solarized_dark"
+    },
+    "solarized_light":{
+        "foreground":"#52676f",
+        "background":"#fcf4dc",
+        "cursor":"#52676f",
+        "cursor_text":"#e9e2cb",
+        "palette":[
+            "#002731",
+            "#d01b24",
+            "#728905",
+            "#a57705",
+            "#2075c7",
+            "#c61b6e",
+            "#259185",
+            "#e9e2cb",
+            "#001e26",
+            "#bd3612",
+            "#465a61",
+            "#52676f",
+            "#708183",
+            "#5856b9",
+            "#81908f",
+            "#fcf4dc"
+        ],
+        "name":"solarized_light"
+    },
+    "symfonic":{
+        "foreground":"#ffffff",
+        "background":"#000000",
+        "cursor":"#dc322f",
+        "cursor_text":"#ffffff",
+        "palette":[
+            "#000000",
+            "#dc322f",
+            "#56db3a",
+            "#ff8400",
+            "#0084d4",
+            "#b729d9",
+            "#ccccff",
+            "#ffffff",
+            "#1b1d21",
+            "#dc322f",
+            "#56db3a",
+            "#ff8400",
+            "#0084d4",
+            "#b729d9",
+            "#ccccff",
+            "#ffffff"
+        ],
+        "name":"symfonic"
+    },
+    "terminal_basic":{
+        "foreground":"#000000",
+        "background":"#ffffff",
+        "cursor":"#7f7f7f",
+        "cursor_text":"#000000",
+        "palette":[
+            "#000000",
+            "#990000",
+            "#00a600",
+            "#999900",
+            "#0000b2",
+            "#b200b2",
+            "#00a6b2",
+            "#bfbfbf",
+            "#666666",
+            "#e50000",
+            "#00d900",
+            "#e5e500",
+            "#0000ff",
+            "#e500e5",
+            "#00e5e5",
+            "#e5e5e5"
+        ],
+        "name":"terminal_basic"
+    },
+    "vaughn":{
+        "foreground":"#dcdccc",
+        "background":"#25234e",
+        "cursor":"#ff5555",
+        "cursor_text":"#ffffff",
+        "palette":[
+            "#24234f",
+            "#705050",
+            "#60b48a",
+            "#dfaf8f",
+            "#5555ff",
+            "#f08cc3",
+            "#8cd0d3",
+            "#709080",
+            "#709080",
+            "#dca3a3",
+            "#60b48a",
+            "#f0dfaf",
+            "#5555ff",
+            "#ec93d3",
+            "#93e0e3",
+            "#ffffff"
+        ],
+        "name":"vaughn"
+    },
+    "zenburn":{
+        "foreground":"#dcdccc",
+        "background":"#3f3f3f",
+        "cursor":"#73635a",
+        "cursor_text":"#000000",
+        "palette":[
+            "#4d4d4d",
+            "#705050",
+            "#60b48a",
+            "#f0dfaf",
+            "#506070",
+            "#dc8cc3",
+            "#8cd0d3",
+            "#dcdccc",
+            "#709080",
+            "#dca3a3",
+            "#c3bf9f",
+            "#e0cf9f",
+            "#94bff3",
+            "#ec93d3",
+            "#93e0e3",
+            "#ffffff"
+        ],
+        "name":"zenburn"
+    }
+};
+
+module.exports = {
+    'defaults': defaults,
+    'colors': colors
+}
+},{}],4:[function(_dereq_,module,exports){
 function inherits(a, c) {
     function k() {
         this.constructor = a

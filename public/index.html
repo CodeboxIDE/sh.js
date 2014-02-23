@@ -10,7 +10,11 @@
         <div class="terminal-1 terminal-panel"></div>
         <script>
         var openTerminal = function(el) {
-            var term = new Terminal(80, 6);
+            var term = new Terminal({
+                theme: "desert",
+                cols: 80,
+                rows: 24
+            });
             term.open($(el).get(0));
 
             term.sizeToFit();
