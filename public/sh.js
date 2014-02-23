@@ -1001,6 +1001,8 @@ Terminal.prototype.keyDown = function (a) {
     var c = this,
         k = null;
     switch (a.keyCode) {
+
+    // backspace
     case 8:
         if (a.shiftKey) {
             k = "\b";
@@ -1012,6 +1014,8 @@ Terminal.prototype.keyDown = function (a) {
         }
         k = "\u007f";
         break;
+
+    // tab
     case 9:
         if (a.shiftKey) {
             k = "\u001b[Z";
@@ -1020,26 +1024,42 @@ Terminal.prototype.keyDown = function (a) {
         k =
             "\t";
         break;
+
+    // return/enter
     case 13:
         k = "\r";
         break;
+
+    // escape
     case 27:
         k = "\u001b";
         break;
+
+    // left-arrow
     case 37:
         if (this.applicationCursor) {
             k = "\u001bOD";
             break
+        } else if(a.altKey) {
+            k = '\x1bb';
+            break
         }
         k = "\u001b[D";
         break;
+
+    // right-arrow
     case 39:
         if (this.applicationCursor) {
             k = "\u001bOC";
             break
+        } else if(a.altKey) {
+            k = '\x1bf';
+            break
         }
         k = "\u001b[C";
         break;
+
+    // up-arrow
     case 38:
         if (this.applicationCursor) {
             k = "\u001bOA";
@@ -1048,6 +1068,8 @@ Terminal.prototype.keyDown = function (a) {
         if (a.ctrlKey) return this.scrollDisp(-1), t(a);
         k = "\u001b[A";
         break;
+
+    // down-arrow
     case 40:
         if (this.applicationCursor) {
             k = "\u001bOB";
@@ -1056,12 +1078,18 @@ Terminal.prototype.keyDown = function (a) {
         if (a.ctrlKey) return this.scrollDisp(1), t(a);
         k = "\u001b[B";
         break;
+
+    // delete
     case 46:
         k = "\u001b[3~";
         break;
+
+    // insert
     case 45:
         k = "\u001b[2~";
         break;
+
+    // home
     case 36:
         if (this.applicationKeypad) {
             k =
@@ -1070,6 +1098,8 @@ Terminal.prototype.keyDown = function (a) {
         }
         k = "\u001bOH";
         break;
+
+    // end
     case 35:
         if (this.applicationKeypad) {
             k = "\u001bOF";
@@ -1077,47 +1107,75 @@ Terminal.prototype.keyDown = function (a) {
         }
         k = "\u001bOF";
         break;
+
+    // page up
     case 33:
         if (a.shiftKey) return this.scrollDisp(-(this.rows - 1)), events.cancel(a);
         k = "\u001b[5~";
         break;
+
+    // page down
     case 34:
         if (a.shiftKey) return this.scrollDisp(this.rows - 1), events.cancel(a);
         k = "\u001b[6~";
         break;
+
+    // F1
     case 112:
         k = "\u001bOP";
         break;
+
+    // F2
     case 113:
         k = "\u001bOQ";
         break;
+
+    // F3
     case 114:
         k = "\u001bOR";
         break;
+
+    // F4
     case 115:
         k = "\u001bOS";
         break;
+
+    // F5
     case 116:
         k = "\u001b[15~";
         break;
+
+    // F6
     case 117:
         k = "\u001b[17~";
         break;
+
+    // F7
     case 118:
         k = "\u001b[18~";
         break;
+
+    // F8
     case 119:
         k = "\u001b[19~";
         break;
+
+    // F9
     case 120:
         k = "\u001b[20~";
         break;
+
+    // F10
     case 121:
         k = "\u001b[21~";
         break;
+
+    // F11
     case 122:
         k = "\u001b[23~";
         break;
+
+    // F12
     case 123:
         k = "\u001b[24~";
         break;
