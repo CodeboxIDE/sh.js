@@ -275,7 +275,6 @@ Terminal.prototype.open = function (parent) {
               if (el === Terminal.focus.element) return;
             } while (el = el.parentNode);
 
-            console.log("blur terminal");
             Terminal.focus.blur();
         });
 
@@ -291,6 +290,10 @@ Terminal.prototype.open = function (parent) {
                 button = button === 1 ? 0 : button === 4 ? 1 : button;
             }
 
+            // If user select text
+            if (utils.getSelection()) return;
+
+            // Not right button
             if (button !== 2) return that.focus();
             
             that.element.contentEditable = true;

@@ -395,7 +395,6 @@ Terminal.prototype.open = function (parent) {
               if (el === Terminal.focus.element) return;
             } while (el = el.parentNode);
 
-            console.log("blur terminal");
             Terminal.focus.blur();
         });
 
@@ -411,6 +410,10 @@ Terminal.prototype.open = function (parent) {
                 button = button === 1 ? 0 : button === 4 ? 1 : button;
             }
 
+            // If user select text
+            if (utils.getSelection()) return;
+
+            // Not right button
             if (button !== 2) return that.focus();
             
             that.element.contentEditable = true;
@@ -2711,6 +2714,18 @@ function isVisible(el) {
     );
 }
 
+function getSelection() {
+    var html = "";
+    if (typeof window.getSelection != "undefined") {
+        return window.getSelection().toString();
+    } else if (typeof document.selection != "undefined") {
+        if (document.selection.type == "Text") {
+            return document.selection.createRange().htmlText;
+        }
+    }
+    return null;
+}
+
 function isBoldBroken() {
     var a = document.createElement("span");
     a.innerHTML =
@@ -2726,7 +2741,8 @@ function isBoldBroken() {
 module.exports = {
     'inherits': inherits,
     'isBoldBroken': isBoldBroken,
-    'isVisible': isVisible
+    'isVisible': isVisible,
+    'getSelection': getSelection
 };
 },{}]},{},[3])
 (3)

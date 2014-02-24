@@ -30,6 +30,18 @@ function isVisible(el) {
     );
 }
 
+function getSelection() {
+    var html = "";
+    if (typeof window.getSelection != "undefined") {
+        return window.getSelection().toString();
+    } else if (typeof document.selection != "undefined") {
+        if (document.selection.type == "Text") {
+            return document.selection.createRange().htmlText;
+        }
+    }
+    return null;
+}
+
 function isBoldBroken() {
     var a = document.createElement("span");
     a.innerHTML =
@@ -45,5 +57,6 @@ function isBoldBroken() {
 module.exports = {
     'inherits': inherits,
     'isBoldBroken': isBoldBroken,
-    'isVisible': isVisible
+    'isVisible': isVisible,
+    'getSelection': getSelection
 };
