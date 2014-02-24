@@ -103,11 +103,10 @@ function off(a, c, k, f) {
     a.removeEventListener(c, k, f || !1)
 }
 
-function cancel(a) {
-    a.preventDefault && a.preventDefault();
-    a.returnValue = !1;
-    a.stopPropagation && a.stopPropagation();
-    a.cancelBubble = !0;
+function cancel(e) {
+    e.preventDefault();
+    e.stopPropagation && e.stopPropagation();
+    e.cancelBubble = !0;
     return !1
 }
 
