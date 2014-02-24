@@ -202,25 +202,21 @@ Terminal.prototype.focus = function () {
         Terminal.focus.blur();
     }
 
+    Terminal.focus = this;
     if (this.sendFocus) this.send("\u001b[I");
 
     this.showCursor();
     this.inputElement.focus();
-
-    Terminal.focus = this;
 };
 
 Terminal.prototype.blur = function() {
     if (Terminal.focus !== this) return;
 
-    this.cursorState = 0;
+    Terminal.focus = null;
     this.redrawCursor();
-
     if (this.sendFocus) this.send("\u001b[O");
 
     this.inputElement.blur();
-
-    Terminal.focus = null;
 };
 
 Terminal.prototype.toggleVirtualCtrlKey = function () {
