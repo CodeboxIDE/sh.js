@@ -28,7 +28,7 @@
             }
 
             var term = new Terminal({
-                theme: "github",
+                theme: "default",
                 cols: 80,
                 rows: 24
             });
@@ -65,11 +65,11 @@
                 });
             });
             socket.on('output', function (data) {
-                term.write(data.content);
+                term.write(atob(data));
             });
 
             term.on("data", function (c) {
-                socket.emit('input', { content: c });
+                socket.emit('input', btoa(c));
             });
 
             term.on("resize", function (c, k) {

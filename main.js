@@ -3,6 +3,13 @@ var io = require('socket.io'),
     express = require('express'),
     http = require('http');
 
+var btoa = function(s) {
+    return (new Buffer(s)).toString('base64');
+};
+
+var atob = function(s) {
+    return (new Buffer(s, 'base64')).toString('binary');
+};
 
 var app = express();
 
@@ -25,11 +32,11 @@ sio.sockets.on('connection', function (socket) {
     });
 
     term.on('data', function(data) {
-        socket.emit('output', { content: data });
+        socket.emit('output', btoa(data));
     });
 
     socket.on('input', function (data) {
-        term.write(data.content);
+        term.write(atob(data));
     });
 
     socket.on('resize', function (data) {
