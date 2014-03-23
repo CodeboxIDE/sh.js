@@ -26,6 +26,7 @@ function Terminal(a, k) {
     this.convertEol = this.cursorHidden = !1;
     this.state = 0;
     this.queue = "";
+    this.writeQueue = "";
     this.scrollTop = 0;
     this.scrollBottom = this.rows - 1;
     this.wraparoundMode = this.insertMode = this.originMode = this.applicationCursor = this.applicationKeypad = !1;
@@ -555,6 +556,15 @@ Terminal.prototype.scrollDisp = function (a) {
 };
 
 Terminal.prototype.write = function (a) {
+    var that = this;
+    this.writeQueue || setTimeout(function () {
+        that._write(that.writeQueue);
+        that.writeQueue = ""
+    }, 1);
+    this.writeQueue += a;
+};
+
+Terminal.prototype._write = function (a) {
     var k = a.length,
         y = 0,
         f;
@@ -1210,8 +1220,8 @@ Terminal.prototype.keyPress = function (a) {
 Terminal.prototype.send = function (a) {
     var that = this;
     this.queue || setTimeout(function () {
-        that.handler(Terminal.queue);
-        Terminal.queue = ""
+        that.handler(that.queue);
+        that.queue = ""
     }, 1);
     this.queue += a;
 };
