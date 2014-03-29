@@ -1,31 +1,73 @@
+var TANGO_COLORS = [
+    // dark:
+    '#2e3436',
+    '#cc0000',
+    '#4e9a06',
+    '#c4a000',
+    '#3465a4',
+    '#75507b',
+    '#06989a',
+    '#d3d7cf',
+    // bright:
+    '#555753',
+    '#ef2929',
+    '#8ae234',
+    '#fce94f',
+    '#729fcf',
+    '#ad7fa8',
+    '#34e2e2',
+    '#eeeeec'
+];
 
 var initColors = function (colors) {
-    function a(a, c, f) {
-        y.push("#" + k(a) + k(c) + k(f))
+    function out(a, c, f) {
+        y.push("#" + hex(a) + hex(c) + hex(f))
     }
 
-    function k(a) {
+    function hex(a) {
         a = a.toString(16);
         return 2 > a.length ? "0" + a : a
     }
     var y = colors,
         f = [0, 95, 135, 175, 215, 255],
         v;
-    for (v = 0; 216 > v; v++) a(f[v / 36 % 6 | 0], f[v / 6 % 6 | 0], f[v % 6]);
-    for (v = 0; 24 > v; v++) f = 8 + 10 * v, a(f, f, f);
-    return y
+        
+    for (v = 0; 216 > v; v++) out(f[v / 36 % 6 | 0], f[v / 6 % 6 | 0], f[v % 6]);
+    
+    for (v = 0; 24 > v; v++) f = 8 + 10 * v, out(f, f, f);
+    
+    return y;
 };
+
+// Our default colors to merge with all others
+var DEFAULT_COLORS = initColors(TANGO_COLORS.slice());
+
+// Merge a theme's colors with our base Tango colors
+var mergeColors = function (themeColors, defaultColors) {
+    if (themeColors.length === 8) {
+        themeColors = themeColors.concat(defaultColors.slice(8));
+    } else if (themeColors.length === 16) {
+        themeColors = themeColors.concat(defaultColors.slice(16));
+    } else if (themeColors.length === 10) {
+        themeColors = themeColors.slice(0, -2).concat(
+            defaultColors.slice(8, -2), themeColors.slice(-2));
+    } else if (themeColors.length === 18) {
+        themeColors = themeColors.concat(
+            defaultColors.slice(16, -2), themeColors.slice(-2));
+    }
+    return themeColors;
+}
 
 // Return colors for a theme
 var colors = function(theme) {
     // Copy pallette
-    var colors = theme.palette.slice(0);
+    var colors = theme.palette.slice();
 
     // Set background and forground colors if available
     colors[256] = theme.background || "#000000";
     colors[257] = theme.foreground || "#f0f0f0";
 
-    return initColors(colors);
+    return mergeColors(colors, DEFAULT_COLORS);
 };
 
 var defaults = {
