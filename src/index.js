@@ -1262,36 +1262,61 @@ Terminal.prototype.error = function () {
     }
 };
 
-Terminal.prototype.resize = function (a, c) {
+Terminal.prototype.resize = function (w, h) {
     var k, f, v;
-    1 > a && (a = 1);
-    1 > c && (c = 1);
+
+    if (w < 1) w = 1;
+    if (h < 1) h = 1;
+
+    // Columns
     v = this.cols;
-    if (v < a) {
+    if (v < w) {
         f = [this.defAttr, " "];
         for (k = this.lines.length; k--;)
-            for (; this.lines[k].length <
-                a;) this.lines[k].push(f)
-    } else if (v > a)
+            for (; this.lines[k].length < w;) this.lines[k].push(f)
+    } else if (v > w)
         for (k = this.lines.length; k--;)
-            for (; this.lines[k].length > a;) this.lines[k].pop();
+            for (; this.lines[k].length > w;) this.lines[k].pop();
     this.setupStops(v);
-    this.cols = a;
+    this.cols = w;
+
+    // Rows
     v = this.rows;
-    if (v < c)
-        for (f = this.element; v++ < c;) this.lines.length < c + this.ybase && this.lines.push(this.blankLine()), this.children.length < c && (k = document.createElement("div"), k.className = "terminal-row", k.setAttribute("data-row", v.toString()), f.appendChild(k), this.children.push(k));
-    else if (v > c)
-        for (; v-- > c;) this.lines.length > c + this.ybase && this.lines.shift(), this.children.length >
-            c && (f = this.children.pop()) && f.parentNode.removeChild(f);
-    this.rows = c;
-    this.y >= c && (this.y = c - 1);
-    this.x >= a && (this.x = a - 1);
+    if (v < h) {
+        for (f = this.element; v++ < h;) {
+            if (this.lines.length < (h + this.ybase)) {
+                this.lines.push(this.blankLine())
+            }
+            if (this.children.length < h) {
+                k = document.createElement("div");
+                k.className = "terminal-row";
+                k.setAttribute("data-row", v.toString());
+                f.appendChild(k);
+                this.children.push(k);
+            }
+        }
+    } else if (v > h) {
+        for (; v-- > h;) {
+            if (this.lines.length > (h + this.ybase)) this.lines.pop();
+            if (this.children.length > h) {
+                f = this.children.pop();
+                if (f) f.parentNode.removeChild(f);
+            }
+        }
+    }
+    this.rows = h;
+
+    if (this.y >= h) this.y = h - 1;
+    if (this.x >= w) this.x = w - 1;
+
     this.scrollTop = 0;
-    this.scrollBottom = c - 1;
+    this.scrollBottom = h - 1;
+
     this.refresh(0, this.rows - 1);
+
     this.normal = null;
-    this.showSize(a, c);
-    this.emit("resize", a, c)
+    this.showSize(w, h);
+    this.emit("resize", w, h)
 };
 
 Terminal.prototype.showSize = function (a, c) {
