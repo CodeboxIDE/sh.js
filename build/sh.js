@@ -122,16 +122,22 @@ var utils = _dereq_("./utils");
 var themes = _dereq_("./themes");
 var charsets = _dereq_("./charsets");
 
-function Terminal(a, k) {
+function Terminal(cols, rows) {
     events.EventEmitter.call(this);
 
     var f;
-    "object" === typeof a && (f = a, a = f.cols, k = f.rows);
+    if("object" === typeof cols) {
+        // Options object
+        f = cols;
+
+        cols = f.cols;
+        rows = f.rows;
+    }
 
     this._options = f || {};
 
-    this.cols = a || Terminal.geometry[0];
-    this.rows = k || Terminal.geometry[1];
+    this.cols = cols || Terminal.geometry[0];
+    this.rows = rows || Terminal.geometry[1];
 
     // Theme
     var theme = this._options.theme;
@@ -141,6 +147,26 @@ function Terminal(a, k) {
     if (!theme) theme = themes.defaults["default"];
     this.colors = themes.colors(theme);
 
+    // Reset state
+    this.resetState(cols, rows);
+}
+
+var s = 1;
+
+utils.inherits(Terminal, events.EventEmitter);
+
+
+Terminal.termName = "xterm";
+Terminal.geometry = [80, 24];
+Terminal.visualBell = !1;
+Terminal.popOnBell = !1;
+Terminal.scrollback = 1E3;
+Terminal.screenKeys = !1;
+Terminal.programFeatures = !1;
+Terminal.debug = !1;
+Terminal.focus = null;
+
+Terminal.prototype.resetState = function(cols, rows) {
     this.cursorState = this.y = this.x = this.ydisp = this.ybase = 0;
     this.convertEol = this.cursorHidden = !1;
     this.state = 0;
@@ -177,25 +203,10 @@ function Terminal(a, k) {
     this.currentParam = 0;
     this.postfix = this.prefix = "";
     this.lines = [];
-    for (a = this.rows; a--;) this.lines.push(this.blankLine());
+    for (var i = this.rows; i--;) this.lines.push(this.blankLine());
     this.tabs;
-    this.setupStops()
-}
-
-var s = 1;
-
-utils.inherits(Terminal, events.EventEmitter);
-
-
-Terminal.termName = "xterm";
-Terminal.geometry = [80, 24];
-Terminal.visualBell = !1;
-Terminal.popOnBell = !1;
-Terminal.scrollback = 1E3;
-Terminal.screenKeys = !1;
-Terminal.programFeatures = !1;
-Terminal.debug = !1;
-Terminal.focus = null;
+    this.setupStops();
+};
 
 Terminal.prototype.focus = function () {
     if (Terminal.focus && Terminal.focus !== this) {
@@ -323,7 +334,7 @@ Terminal.prototype.open = function (parent) {
         this.element.className = "terminal";
         this.element.spellcheck = false;
         for (this.children = []; E < this.rows; E++) y = document.createElement("div"), y.className = "terminal-row", y.setAttribute("data-row", (E + 1).toString()), this.element.appendChild(y), this.children.push(y);
-        
+
         this.inputElement = document.createElement("textarea");
         this.inputElement.className = "terminal-input";
         this.inputElement.rows = "1";
@@ -416,7 +427,7 @@ Terminal.prototype.open = function (parent) {
 
             // Not right button
             if (button !== 2) return that.focus();
-            
+
             that.element.contentEditable = true;
             that.element.focus();
             setTimeout(function() {
@@ -1495,7 +1506,7 @@ Terminal.prototype.reverseIndex = function () {
 };
 
 Terminal.prototype.reset = function () {
-    Terminal.call(this, this.cols, this.rows);
+    this.resetState(this.cols, this.rows);
     this.refresh(0, this.rows - 1)
 };
 
