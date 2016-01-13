@@ -80,8 +80,7 @@ body {
     line-height: 18px;
 }
 .terminal-container .terminal-input {
-    position: absolute;
-    top: 0;
+    position: fixed;
     left: -1000%;
     background: rgba(255,255,255,0.75);
     color: black;

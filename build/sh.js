@@ -422,18 +422,17 @@ Terminal.prototype.open = function (parent) {
                 button = button === 1 ? 0 : button === 4 ? 1 : button;
             }
 
-            // If user select text
-            if (utils.getSelection()) return;
-
             // Not right button
-            if (button !== 2) return that.focus();
+            if (button !== 2) return;
 
             that.element.contentEditable = true;
-            that.element.focus();
             setTimeout(function() {
-                that.inputElement.focus();
                 that.element.contentEditable = 'inherit'; // 'false';
-            }, 1);
+                var selection = utils.getSelection();
+                // If user doesn't select text or ignore one space selection on mac
+                if (!selection || (Terminal.isMac && selection === ' '))
+                    that.inputElement.focus();
+            }, Terminal.isMac ? 1 : 400);
         }, !0);
         events.on(this.inputElement, "paste", function (c) {
             setTimeout(function () {
@@ -475,6 +474,8 @@ Terminal.prototype.sizeToFit = function () {
 
     c.parentNode.removeChild(c);
     a.parentNode.removeChild(a);
+
+    console.log('sizeToFit:', v, k)
     this.resize(v, k)
 };
 
